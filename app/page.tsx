@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   SiReact,
@@ -21,7 +23,14 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
-const skills = [
+type Skill = {
+  name: string;
+  icon: React.ReactNode;
+  desc: string;
+  color: string;
+};
+
+const skills: Skill[] = [
   {
     name: "React",
     icon: <SiReact />,
@@ -195,11 +204,11 @@ function Header() {
 
 function Hero() {
   return (
-    <section className="relative flex min-h-screen items-center px-5 pt-28">
+    <section className="relative flex min-h-screen items-center px-5 py-28">
       <div className="absolute left-[-120px] top-[-120px] h-80 w-80 rounded-full bg-[#FFDCDC] blur-3xl" />
       <div className="absolute bottom-10 right-[-120px] h-96 w-96 rounded-full bg-[#FFD6BA] blur-3xl" />
 
-      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 md:grid-cols-[1.2fr_0.8fr]">
+      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -210,7 +219,7 @@ function Hero() {
             Frontend Developer
           </p>
 
-          <h1 className="text-4xl font-black leading-tight tracking-tight text-[#2F2A28] md:text-6xl">
+          <h1 className="text-4xl font-black leading-tight tracking-tight text-[#2F2A28] sm:text-5xl lg:text-6xl">
             사용자 흐름을 설계하는
             <br />
             프론트엔드 개발자
@@ -220,7 +229,7 @@ function Hero() {
             </span>
           </h1>
 
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-[#6F625C]">
+          <p className="mt-6 max-w-2xl text-base leading-8 text-[#6F625C] sm:text-lg">
             React와 TypeScript를 기반으로 사용자 입력, 상태 관리, API 연동
             흐름을 구현하며 사용자가 자연스럽게 서비스를 이용할 수 있는 화면을
             만듭니다.
@@ -236,6 +245,7 @@ function Hero() {
             <a
               href="https://github.com/k65860"
               target="_blank"
+              rel="noreferrer"
               className="rounded-full border border-[#FFD6BA] bg-white/70 px-6 py-3 text-sm font-bold text-[#2F2A28] transition hover:-translate-y-1 hover:shadow-md"
             >
               GitHub
@@ -243,6 +253,7 @@ function Hero() {
             <a
               href="https://velog.io/@k65860"
               target="_blank"
+              rel="noreferrer"
               className="rounded-full border border-[#FFD6BA] bg-white/70 px-6 py-3 text-sm font-bold text-[#2F2A28] transition hover:-translate-y-1 hover:shadow-md"
             >
               Velog
@@ -250,35 +261,86 @@ function Hero() {
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="rounded-[2rem] border border-[#FFE8CD] bg-white/70 p-7 shadow-[0_24px_80px_rgba(123,83,60,0.12)] backdrop-blur-md"
-        >
-          <div className="rounded-[1.5rem] bg-gradient-to-br from-[#FFDCDC] via-[#FFF2EB] to-[#FFD6BA] p-8">
-            <p className="text-sm font-bold text-[#9A6A54]">
-              Portfolio Summary
-            </p>
-
-            <div className="mt-8 space-y-5">
-              <SummaryItem label="Main Stack" value="React · TypeScript" />
-              <SummaryItem label="Focus" value="UI Flow · API Integration" />
-              <SummaryItem label="Blog" value="70+ Posts" />
-              <SummaryItem label="Certificate" value="SQLD" />
-            </div>
-          </div>
-        </motion.div>
+        <FlipProfileCard />
       </div>
     </section>
   );
 }
 
+function FlipProfileCard() {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.94 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.7, delay: 0.2 }}
+      className="mx-auto w-full max-w-[360px] sm:max-w-[390px] lg:max-w-[420px]"
+    >
+      <button
+        type="button"
+        onClick={() => setIsFlipped((prev) => !prev)}
+        className="group relative h-[500px] w-full cursor-pointer rounded-[2.2rem] outline-none [perspective:1200px] sm:h-[540px]"
+        aria-label="프로필 카드 뒤집기"
+      >
+        <motion.div
+          className="relative h-full w-full rounded-[2.2rem] [transform-style:preserve-3d]"
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="absolute inset-0 overflow-hidden rounded-[2.2rem] border border-[#FFE8CD] bg-white/85 p-4 shadow-[0_24px_80px_rgba(123,83,60,0.16)] backdrop-blur-md [backface-visibility:hidden]">
+            <div className="relative h-full overflow-hidden rounded-[1.7rem] bg-[#FFF2EB]">
+              <Image
+                src="/profile.jpg"
+                alt="김지연 프로필 사진"
+                fill
+                priority
+                className="object-cover object-center transition duration-700 group-hover:scale-105"
+              />
+
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#2F2A28]/75 via-[#2F2A28]/25 to-transparent p-6 text-left">
+                <p className="text-sm font-semibold text-[#FFE8CD]">
+                  Click to flip
+                </p>
+                <h2 className="mt-2 text-3xl font-black text-white">김지연</h2>
+                <p className="mt-1 text-sm font-medium text-white/85">
+                  Frontend Developer
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="absolute inset-0 overflow-hidden rounded-[2.2rem] border border-[#FFE8CD] bg-white/85 p-4 shadow-[0_24px_80px_rgba(123,83,60,0.16)] backdrop-blur-md [backface-visibility:hidden] [transform:rotateY(180deg)]">
+            <div className="flex h-full flex-col rounded-[1.7rem] bg-gradient-to-br from-[#FFDCDC] via-[#FFF2EB] to-[#FFD6BA] p-6 text-left sm:p-7">
+              <p className="text-sm font-bold text-[#9A6A54]">
+                Portfolio Summary
+              </p>
+
+              <div className="mt-5 grid flex-1 content-center gap-3 sm:gap-4">
+                <SummaryItem label="Main Stack" value="React · TypeScript" />
+                <SummaryItem label="Focus" value="UI Flow · API Integration" />
+                <SummaryItem label="Blog" value="70+ Posts" />
+                <SummaryItem label="Certificate" value="SQLD" />
+              </div>
+
+              <p className="mt-4 text-center text-xs font-semibold text-[#9A6A54]">
+                Click again to profile
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </button>
+    </motion.div>
+  );
+}
+
 function SummaryItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-white/65 p-5">
+    <div className="rounded-2xl bg-white/70 px-5 py-4 shadow-sm">
       <p className="text-sm text-[#9A8175]">{label}</p>
-      <p className="mt-1 text-xl font-black text-[#2F2A28]">{value}</p>
+      <p className="mt-1 break-keep text-xl font-black leading-snug text-[#2F2A28]">
+        {value}
+      </p>
     </div>
   );
 }
@@ -360,15 +422,19 @@ function Projects() {
                   <p className="text-sm font-black text-[#9A6A54]">
                     Project 0{index + 1}
                   </p>
+
                   <h3 className="mt-4 text-4xl font-black text-[#2F2A28]">
                     {project.title}
                   </h3>
+
                   <p className="mt-2 text-lg font-bold text-[#6F625C]">
                     {project.subtitle}
                   </p>
+
                   <p className="mt-4 text-sm font-semibold text-[#9A8175]">
                     {project.period}
                   </p>
+
                   <p className="mt-6 leading-7 text-[#6F625C]">
                     {project.description}
                   </p>
@@ -389,14 +455,17 @@ function Projects() {
                       <a
                         href={project.service}
                         target="_blank"
+                        rel="noreferrer"
                         className="inline-flex items-center gap-2 rounded-full bg-[#2F2A28] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-1"
                       >
                         Service <FiExternalLink />
                       </a>
                     )}
+
                     <a
                       href={project.github}
                       target="_blank"
+                      rel="noreferrer"
                       className="inline-flex items-center gap-2 rounded-full bg-white/75 px-5 py-3 text-sm font-bold text-[#2F2A28] transition hover:-translate-y-1"
                     >
                       GitHub <FiGithub />
@@ -408,6 +477,7 @@ function Projects() {
                   <h4 className="text-lg font-black text-[#2F2A28]">
                     담당 역할
                   </h4>
+
                   <ul className="mt-4 space-y-3">
                     {project.roles.map((role) => (
                       <li
@@ -471,9 +541,11 @@ function Skills() {
               >
                 {skill.icon}
               </div>
+
               <h3 className="mt-5 text-lg font-black text-[#2F2A28]">
                 {skill.name}
               </h3>
+
               <p className="mt-2 text-sm leading-6 text-[#6F625C]">
                 {skill.desc}
               </p>
@@ -486,6 +558,29 @@ function Skills() {
 }
 
 function Experience() {
+  const experienceData = [
+    {
+      title: "Education",
+      items: [
+        "삼육대학교 인공지능융합학부 / 컴퓨터공학부",
+        "2021.03 - 2026.02",
+      ],
+    },
+    {
+      title: "Activities",
+      items: [
+        "삼육대학교 멋쟁이사자처럼 부원 및 운영진",
+        "멋쟁이사자처럼 해커톤 참가",
+        "SW 중심대학 해커톤 참가",
+        "엘리스트랙 부트캠프 수료",
+      ],
+    },
+    {
+      title: "Certificate",
+      items: ["SQLD 취득"],
+    },
+  ];
+
   return (
     <section className="bg-white/45 px-5 py-24">
       <div className="mx-auto max-w-6xl">
@@ -495,35 +590,48 @@ function Experience() {
           desc="프론트엔드 개발자로 성장하기 위해 학습, 해커톤, 부트캠프 경험을 쌓았습니다."
         />
 
-        <div className="mt-12 grid gap-5 md:grid-cols-2">
-          <TimelineCard
-            title="Education"
-            items={[
-              "삼육대학교 인공지능융합학부 / 컴퓨터공학부 복수전공",
-              "2021.03 - 2026.02",
-            ]}
-          />
-          <TimelineCard
-            title="Activities"
-            items={[
-              "삼육대학교 멋쟁이사자처럼 운영진",
-              "멋쟁이사자처럼 해커톤 참가",
-              "SW 중심대학 해커톤 참가",
-              "엘리스트랙 프론트엔드&백엔드 웹 개발자 트랙 수료",
-            ]}
-          />
-          <TimelineCard title="자격증" items={["제 60회 SQL 개발자 취득"]} />
-          <TimelineCard
-            title="Profile"
-            items={[
-              "Velog: velog.io/@k65860",
-              "GitHub: github.com/k65860",
-              "Email: jy_0327@naver.com",
-            ]}
-          />
+        <div className="mt-14 space-y-6">
+          {experienceData.map((section, index) => (
+            <motion.div
+              key={section.title}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={fadeUp}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
+            >
+              <ExperienceRow title={section.title} items={section.items} />
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function ExperienceRow({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="rounded-[2rem] border border-[#FFE8CD] bg-white/75 px-6 py-7 shadow-sm backdrop-blur-md md:px-8">
+      <div className="flex flex-col gap-6 md:flex-row md:gap-10">
+        <div className="md:w-[180px] md:shrink-0">
+          <p className="text-lg font-black text-[#2F2A28] md:text-xl">
+            {title}
+          </p>
+        </div>
+
+        <ul className="flex-1 space-y-4">
+          {items.map((item) => (
+            <li
+              key={item}
+              className="flex gap-3 text-base leading-7 text-[#6F625C]"
+            >
+              <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[#D88F73]" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
@@ -531,6 +639,7 @@ function TimelineCard({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="rounded-[2rem] border border-[#FFE8CD] bg-white/75 p-7 shadow-sm">
       <h3 className="text-xl font-black text-[#2F2A28]">{title}</h3>
+
       <ul className="mt-5 space-y-3">
         {items.map((item) => (
           <li key={item} className="leading-7 text-[#6F625C]">
@@ -556,6 +665,7 @@ function Contact() {
         <p className="text-sm font-black uppercase tracking-[0.3em] text-[#9A6A54]">
           Contact
         </p>
+
         <h2 className="mt-5 text-3xl font-black leading-tight text-[#2F2A28] md:text-5xl">
           함께 사용자에게 더 좋은 흐름을 만드는
           <br />
@@ -564,21 +674,25 @@ function Contact() {
 
         <div className="mt-9 flex flex-wrap justify-center gap-3">
           <a
-            href="mailto:jy_0327@naver.com"
+            href="mailto:jiyeon020327@gmail.com"
             className="inline-flex items-center gap-2 rounded-full bg-[#2F2A28] px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-1"
           >
             메일 보내기 <FiMail />
           </a>
+
           <a
             href="https://github.com/k65860"
             target="_blank"
+            rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-white/75 px-6 py-3 text-sm font-bold text-[#2F2A28] transition hover:-translate-y-1"
           >
             GitHub <FiGithub />
           </a>
+
           <a
             href="https://velog.io/@k65860"
             target="_blank"
+            rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-white/75 px-6 py-3 text-sm font-bold text-[#2F2A28] transition hover:-translate-y-1"
           >
             Velog <FiExternalLink />
@@ -610,9 +724,11 @@ function SectionTitle({
       <p className="text-sm font-black uppercase tracking-[0.3em] text-[#D88F73]">
         {eyebrow}
       </p>
+
       <h2 className="mt-4 text-3xl font-black leading-tight text-[#2F2A28] md:text-5xl">
         {title}
       </h2>
+
       <p className="mt-5 text-lg leading-8 text-[#6F625C]">{desc}</p>
     </motion.div>
   );
