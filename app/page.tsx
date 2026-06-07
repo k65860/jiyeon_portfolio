@@ -590,7 +590,7 @@ function Projects() {
 
                   <div className="mt-6 flex items-start gap-5">
                     <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.4rem] border border-[#FFE8CD] bg-white/80 text-3xl shadow-sm">
-                      {project.title === "Carebuddy" ? "🐾" : "🗺️"}
+                      {project.title === "Carebuddy" ? "🐾" : "👶🏻"}
                     </div>
 
                     <div>
