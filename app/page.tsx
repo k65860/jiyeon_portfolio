@@ -435,9 +435,6 @@ function Hero() {
               />
 
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#2F2A28]/70 via-[#2F2A28]/20 to-transparent px-6 pb-6 pt-24 text-white">
-                <p className="mb-2 text-xs font-black text-[#FFE8CD]">
-                  Click to flip
-                </p>
                 <h2 className="text-3xl font-black tracking-[-0.04em]">
                   김지연
                 </h2>
