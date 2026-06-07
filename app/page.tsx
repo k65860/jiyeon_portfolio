@@ -47,6 +47,11 @@ type Trouble = {
   result: string;
 };
 
+type FeatureGroup = {
+  title: string;
+  items: string[];
+};
+
 type Project = {
   title: string;
   subtitle: string;
@@ -55,6 +60,7 @@ type Project = {
   tech: string[];
   roles: string[];
   flow: string[];
+  featureGroups?: FeatureGroup[];
   images: ProjectImage[];
   troubles: Trouble[];
   github: string;
@@ -97,11 +103,9 @@ const projects: Project[] = [
       "Styled-components",
     ],
     roles: [
-      "전체 페이지 라우팅 및 공통 레이아웃 설계",
-      "로그인 이후 사용자 정보 조회/수정 흐름 구현",
-      "반려동물 카드 CRUD 및 수정 모달 구현",
-      "작성 글 목록 조회 및 질병 그룹별 필터링 UI 구현",
-      "마이페이지 중심 사용자 정보 재사용 구조 정리",
+      "Notion 기반 페이지명·컴포넌트명·기능명 문서화로 프론트엔드 구현 범위 정리",
+      "Header, Secondary Header를 포함한 공통 레이아웃과 전체 페이지 라우팅 구조 설계",
+      "마이페이지, 반려동물 카드, 작성 글 목록의 API 연동과 상태 갱신 흐름 구현",
     ],
     flow: [
       "로그인 → 사용자 정보 조회 → 마이페이지 기본값 반영",
@@ -109,45 +113,89 @@ const projects: Project[] = [
       "반려동물 카드 생성/수정/삭제 → 카드 목록 반영",
       "작성 글 목록 조회 → 게시글 상세 확인",
     ],
+    featureGroups: [
+      {
+        title: "공통 레이아웃 및 라우팅",
+        items: [
+          "전체 페이지 라우팅 구조 설계",
+          "로고, 주요 페이지 이동 메뉴, 사용자 아이콘이 포함된 Header 구현",
+          "페이지별 카테고리와 현재 페이지명을 표시하는 Secondary Header 구현",
+        ],
+      },
+      {
+        title: "마이페이지 사용자 정보 관리",
+        items: [
+          "로그인한 사용자 정보를 조회하여 프로필 이미지, 닉네임, 소개글을 화면에 렌더링",
+          "프로필 수정 API를 연동하고, 수정 완료 후 서버 응답값을 기준으로 화면 상태 갱신",
+          "새로고침 없이 변경 결과가 반영되도록 전역 상태와 로컬 상태를 함께 관리",
+          "회원탈퇴 기능은 사용자 이탈 방지를 고려해 주요 동선에서 벗어난 위치에 배치",
+        ],
+      },
+      {
+        title: "반려동물 카드 CRUD",
+        items: [
+          "로그인한 사용자의 반려동물 ID를 기반으로 등록된 반려동물 목록 조회",
+          "반려동물 정보를 카드 UI로 렌더링",
+          "반려동물 등록/수정 모달 구현",
+          "등록 및 수정 버튼 클릭 시 API 요청을 전송하고, 응답 결과에 따라 목록 상태 갱신",
+        ],
+      },
+      {
+        title: "작성 글 목록 조회",
+        items: [
+          "로그인한 사용자 ID를 기반으로 작성 글 목록 조회",
+          "작성 글에 대분류·소분류 정보를 함께 표시",
+          "제목 클릭 시 useNavigate를 활용해 post.id 기반 상세 페이지로 이동",
+          "데이터 요청 중 isLoading 상태를 활용해 로딩 UI를 조건부 렌더링",
+        ],
+      },
+    ],
     images: [
       {
         src: "/projects/carebuddy/carebuddy-01.png",
-        caption: "회원 정보 조회/수정, 반려동물 카드, 작성 글 목록 관리 화면",
+        caption:
+          "마이페이지 전체 구조: 사용자 정보 조회/수정, 반려동물 카드, 작성 글 목록 관리",
         device: "desktop",
       },
       {
         src: "/projects/carebuddy/carebuddy-02.png",
-        caption: "반려동물 카드와 작성 글 목록 UI",
+        caption: "반려동물 카드와 사용자 작성 글 목록 UI",
         device: "desktop",
       },
       {
-        src: "/projects/carebuddy/carebuddy-05.png",
-        caption: "게시글 상세, 좋아요, 댓글 인터랙션 화면",
+        src: "/projects/carebuddy/carebuddy-03.png",
+        caption: "반려동물 등록 모달 상단: 프로필 이미지, 이름, 성별, 종 입력",
+        device: "desktop",
+      },
+      {
+        src: "/projects/carebuddy/carebuddy-04.png",
+        caption:
+          "반려동물 등록 모달 하단: 나이, 중성화 여부, 체중 입력 및 등록 요청",
         device: "desktop",
       },
     ],
     troubles: [
       {
-        title: "사용자 정보 중복 호출 문제",
+        title: "CORS 이슈 해결",
         problem:
-          "로그인 이후 마이페이지, 유저페이지 등 여러 화면에서 동일한 사용자 정보가 필요했습니다.",
+          "프론트엔드와 백엔드가 분리된 환경에서 API를 연동하는 과정 중, 브라우저 CORS 정책으로 인해 마이페이지 관련 요청이 차단되었습니다.",
         cause:
-          "각 페이지에서 개별 GET 요청을 보내면 중복 호출이 발생하고, 수정 이후 다른 화면과 데이터가 어긋날 수 있었습니다.",
+          "프론트엔드 배포 주소와 로컬 개발 주소가 백엔드 CORS 허용 origin에 포함되어 있지 않았고, 요청 방식과 credentials 설정 여부도 함께 확인이 필요한 상황이었습니다.",
         solution:
-          "로그인 성공 시 사용자 정보를 Recoil atom에 저장하고, 프로필 수정 완료 후에는 서버 응답값을 기준으로 atom과 로컬 입력 상태를 함께 갱신했습니다.",
+          "백엔드 팀과 함께 요청 주소, 허용 origin, credentials 설정 여부를 점검했습니다. 프론트엔드에서는 Axios 요청 경로와 API 호출 방식을 정리했고, 백엔드에서는 프론트엔드 배포 주소와 로컬 개발 주소를 허용하도록 CORS 설정을 수정했습니다.",
         result:
-          "사용자 정보 조회 로직을 공통화했고, 수정 이후에도 여러 화면에서 동일한 사용자 정보를 참조할 수 있도록 상태 흐름을 정리했습니다.",
+          "API 요청이 정상적으로 처리되면서 마이페이지 사용자 정보 조회/수정, 반려동물 카드 조회/등록/수정, 사용자 작성 글 목록 조회 기능을 안정적으로 연결할 수 있었습니다.",
       },
       {
-        title: "반려동물 카드 CRUD와 모달 상태 관리",
+        title: "사용자 정보 상태 관리 구조화",
         problem:
-          "반려동물 카드 생성/수정 흐름이 카드 목록과 분리되면 사용자가 작업 결과를 바로 확인하기 어려웠습니다.",
+          "로그인 이후 마이페이지와 유저페이지 등 여러 화면에서 동일한 사용자 정보가 필요했습니다.",
         cause:
-          "폼 입력, 수정 모달, 카드 목록 갱신 타이밍이 분리되면 UI 일관성이 깨질 수 있었습니다.",
+          "각 페이지에서 사용자 정보를 개별 호출하면 중복 요청이 발생하고, 프로필 수정 이후 화면마다 데이터가 다르게 보일 수 있었습니다.",
         solution:
-          "생성/수정 요청 이후 카드 목록이 바로 반영되도록 상태 흐름을 연결하고, 수정은 모달 기반으로 처리했습니다.",
+          "로그인 사용자 정보를 전역 상태로 관리하고, 프로필 수정 완료 후 서버 응답값을 기준으로 전역 상태와 로컬 입력 상태를 함께 갱신했습니다.",
         result:
-          "사용자는 같은 화면 안에서 반려동물 등록, 수정, 확인까지 자연스럽게 이어서 수행할 수 있게 되었습니다.",
+          "사용자 정보 조회 로직이 단순해졌고, 새로고침 없이 수정 결과가 화면에 반영되도록 상태 흐름을 일관되게 관리할 수 있었습니다.",
       },
     ],
     github: "https://github.com/k65860/Carebuddy",
@@ -221,7 +269,7 @@ const projects: Project[] = [
           "사용자는 하나의 모달 흐름 안에서 키워드 선택, 추천 활동 확인, 기록 저장까지 자연스럽게 진행할 수 있게 되었습니다.",
       },
     ],
-    github: "https://github.com/PlayguideP/frontend",
+    github: "https://github.com/k65860/playmap",
     status: "기업 협업 프로젝트 · 현재 배포 종료",
   },
 ];
@@ -569,198 +617,231 @@ function Projects() {
         />
 
         <div className="mt-12 space-y-16">
-          {projects.map((project, index) => (
-            <motion.article
-              key={project.title}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.12 }}
-              variants={fadeUp}
-              transition={{ duration: 0.6 }}
-              className="overflow-hidden rounded-[2.5rem] border border-[#FFE8CD] bg-white/80 shadow-[0_28px_90px_rgba(123,83,60,0.09)] backdrop-blur-md"
-            >
-              <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
-                <div className="border-b border-[#FFE8CD] bg-gradient-to-br from-[#FFDCDC] via-[#FFF8F4] to-[#FFE8CD] p-8 md:p-10 lg:border-b-0 lg:border-r">
-                  <p className="text-sm font-black uppercase tracking-[0.22em] text-[#D88F73]">
-                    Project {String(index + 1).padStart(2, "0")}
-                  </p>
+          {projects.map((project, index) => {
+            const hasMobileImage = project.images.some(
+              (image) => image.device === "mobile",
+            );
 
-                  <div className="mt-6 flex items-start gap-5">
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.4rem] border border-[#FFE8CD] bg-white/80 text-3xl shadow-sm">
-                      {project.title === "Carebuddy" ? "🐾" : "👶🏻"}
+            return (
+              <motion.article
+                key={project.title}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.12 }}
+                variants={fadeUp}
+                transition={{ duration: 0.6 }}
+                className="overflow-hidden rounded-[2.5rem] border border-[#FFE8CD] bg-white/80 shadow-[0_28px_90px_rgba(123,83,60,0.09)] backdrop-blur-md"
+              >
+                <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
+                  <div className="border-b border-[#FFE8CD] bg-gradient-to-br from-[#FFDCDC] via-[#FFF8F4] to-[#FFE8CD] p-8 md:p-10 lg:border-b-0 lg:border-r">
+                    <p className="text-sm font-black uppercase tracking-[0.22em] text-[#D88F73]">
+                      Project {String(index + 1).padStart(2, "0")}
+                    </p>
+
+                    <div className="mt-6 flex items-start gap-5">
+                      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.4rem] border border-[#FFE8CD] bg-white/80 text-3xl shadow-sm">
+                        {project.title === "Carebuddy" ? "🐾" : "👶🏻"}
+                      </div>
+
+                      <div>
+                        <h3 className="text-4xl font-black tracking-[-0.04em] text-[#2F2A28] md:text-5xl">
+                          {project.title}
+                        </h3>
+                        <p className="mt-2 break-keep text-lg font-bold text-[#6F625C]">
+                          {project.subtitle}
+                        </p>
+                      </div>
                     </div>
 
-                    <div>
-                      <h3 className="text-4xl font-black tracking-[-0.04em] text-[#2F2A28] md:text-5xl">
-                        {project.title}
-                      </h3>
-                      <p className="mt-2 break-keep text-lg font-bold text-[#6F625C]">
-                        {project.subtitle}
-                      </p>
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      <span className="rounded-full bg-white/75 px-4 py-2 text-xs font-black text-[#9A8175]">
+                        {project.period}
+                      </span>
+
+                      {project.status && (
+                        <span className="rounded-full bg-[#2F2A28]/85 px-4 py-2 text-xs font-bold text-white">
+                          {project.status}
+                        </span>
+                      )}
                     </div>
-                  </div>
 
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-white/75 px-4 py-2 text-xs font-black text-[#9A8175]">
-                      {project.period}
-                    </span>
+                    <p className="mt-7 break-keep leading-8 text-[#6F625C]">
+                      {project.description}
+                    </p>
 
-                    {project.status && (
-                      <span className="rounded-full bg-[#2F2A28]/85 px-4 py-2 text-xs font-bold text-white">
-                        {project.status}
-                      </span>
-                    )}
-                  </div>
+                    <div className="mt-7 flex flex-wrap gap-2">
+                      {project.tech.map((item) => (
+                        <span
+                          key={item}
+                          className="rounded-full bg-white/70 px-3.5 py-2 text-xs font-black text-[#6F625C] shadow-sm"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </div>
 
-                  <p className="mt-7 break-keep leading-8 text-[#6F625C]">
-                    {project.description}
-                  </p>
+                    <div className="mt-9 flex flex-wrap gap-3">
+                      {project.service && (
+                        <a
+                          href={project.service}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-[#2F2A28] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-1"
+                        >
+                          Service <FiExternalLink />
+                        </a>
+                      )}
 
-                  <div className="mt-7 flex flex-wrap gap-2">
-                    {project.tech.map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full bg-white/70 px-3.5 py-2 text-xs font-black text-[#6F625C] shadow-sm"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-9 flex flex-wrap gap-3">
-                    {project.service && (
                       <a
-                        href={project.service}
+                        href={project.github}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full bg-[#2F2A28] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-1"
+                        className="inline-flex items-center gap-2 rounded-full bg-white/80 px-5 py-3 text-sm font-bold text-[#2F2A28] shadow-sm transition hover:-translate-y-1"
                       >
-                        Service <FiExternalLink />
+                        GitHub <FiGithub />
                       </a>
-                    )}
+                    </div>
+                  </div>
 
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full bg-white/80 px-5 py-3 text-sm font-bold text-[#2F2A28] shadow-sm transition hover:-translate-y-1"
-                    >
-                      GitHub <FiGithub />
-                    </a>
+                  <div className="p-8 md:p-10">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#FFF8F4] text-[#D88F73]">
+                        ✦
+                      </span>
+                      <h4 className="text-xl font-black tracking-[-0.02em] text-[#2F2A28]">
+                        역할 요약
+                      </h4>
+                    </div>
+
+                    <div className="mt-5 grid gap-3">
+                      {project.roles.map((role, roleIndex) => (
+                        <div
+                          key={role}
+                          className="flex items-start gap-4 rounded-[1.25rem] border border-[#FFE8CD] bg-[#FFF8F4]/80 px-4 py-4"
+                        >
+                          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-black text-[#D88F73] shadow-sm">
+                            {roleIndex + 1}
+                          </span>
+                          <p className="break-keep text-sm font-bold leading-6 text-[#6F625C]">
+                            {role}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="p-8 md:p-10">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#FFF8F4] text-[#D88F73]">
-                      ✦
-                    </span>
-                    <h4 className="text-xl font-black tracking-[-0.02em] text-[#2F2A28]">
-                      핵심 기여
-                    </h4>
+                {project.flow.length > 0 && (
+                  <div className="border-t border-[#FFE8CD] bg-[#FFF8F4]/70 px-8 py-6 md:px-10">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+                      <p className="shrink-0 pt-2 text-sm font-black text-[#2F2A28]">
+                        사용자 흐름
+                      </p>
+
+                      <div className="grid flex-1 gap-3 md:grid-cols-2">
+                        {project.flow.map((flow, flowIndex) => (
+                          <div
+                            key={flow}
+                            className="flex gap-3 rounded-2xl border border-[#FFE8CD] bg-white/80 px-4 py-3"
+                          >
+                            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#D88F73] text-xs font-black text-white">
+                              {flowIndex + 1}
+                            </span>
+                            <p className="break-keep text-sm font-bold leading-6 text-[#6F625C]">
+                              {flow}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="border-t border-[#FFE8CD] p-8 md:p-10">
+                  <div className="mb-6 flex items-end justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-black uppercase tracking-[0.25em] text-[#D88F73]">
+                        Screens
+                      </p>
+                      <h4 className="mt-2 text-2xl font-black tracking-[-0.03em] text-[#2F2A28]">
+                        주요 화면
+                      </h4>
+                    </div>
+
+                    <p className="hidden text-sm font-bold text-[#9A8175] md:block">
+                      {hasMobileImage ? "Mobile UI" : "Desktop UI"}
+                    </p>
                   </div>
 
-                  <div className="mt-5 grid gap-3">
-                    {project.roles.map((role, roleIndex) => (
-                      <div
-                        key={role}
-                        className="flex items-center gap-4 rounded-[1.25rem] border border-[#FFE8CD] bg-[#FFF8F4]/80 px-4 py-4"
-                      >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-black text-[#D88F73] shadow-sm">
-                          {roleIndex + 1}
-                        </span>
-                        <p className="break-keep text-sm font-bold leading-6 text-[#6F625C]">
-                          {role}
-                        </p>
-                      </div>
+                  <div
+                    className={
+                      hasMobileImage
+                        ? "grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+                        : "grid gap-5 md:grid-cols-2"
+                    }
+                  >
+                    {project.images.map((image, imageIndex) => (
+                      <ProjectImageCard
+                        key={image.src}
+                        image={image}
+                        onClick={() =>
+                          openImageModal(
+                            project.title,
+                            project.images,
+                            imageIndex,
+                          )
+                        }
+                      />
                     ))}
                   </div>
                 </div>
-              </div>
 
-              <div className="border-t border-[#FFE8CD] bg-[#FFF8F4]/70 px-8 py-6 md:px-10">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-                  <p className="shrink-0 pt-2 text-sm font-black text-[#2F2A28]">
-                    사용자 흐름
-                  </p>
+                {project.featureGroups && (
+                  <div className="border-t border-[#FFE8CD] bg-white p-8 md:p-10">
+                    <div className="mb-6">
+                      <p className="text-sm font-black uppercase tracking-[0.25em] text-[#D88F73]">
+                        Implementation
+                      </p>
+                      <h4 className="mt-2 text-2xl font-black tracking-[-0.03em] text-[#2F2A28]">
+                        주요 구현 기능
+                      </h4>
+                      <p className="mt-3 break-keep text-sm leading-6 text-[#9A8175]">
+                        기능을 화면 구조, 사용자 상태, API 연동 흐름 기준으로
+                        나누어 정리했습니다.
+                      </p>
+                    </div>
 
-                  <div className="grid flex-1 gap-3 md:grid-cols-2">
-                    {project.flow.map((flow, flowIndex) => (
-                      <div
-                        key={flow}
-                        className="flex gap-3 rounded-2xl border border-[#FFE8CD] bg-white/80 px-4 py-3"
-                      >
-                        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#D88F73] text-xs font-black text-white">
-                          {flowIndex + 1}
-                        </span>
-                        <p className="break-keep text-sm font-bold leading-6 text-[#6F625C]">
-                          {flow}
-                        </p>
-                      </div>
-                    ))}
+                    <div className="grid gap-5 lg:grid-cols-2">
+                      {project.featureGroups.map((group, groupIndex) => (
+                        <FeatureGroupCard
+                          key={group.title}
+                          group={group}
+                          index={groupIndex}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </div>
+                )}
 
-              <div className="border-t border-[#FFE8CD] p-8 md:p-10">
-                <div className="mb-6 flex items-end justify-between gap-4">
-                  <div>
+                <div className="border-t border-[#FFE8CD] bg-[#FFF8F4]/50 p-8 md:p-10">
+                  <div className="mb-6">
                     <p className="text-sm font-black uppercase tracking-[0.25em] text-[#D88F73]">
-                      Screens
+                      Trouble Shooting
                     </p>
                     <h4 className="mt-2 text-2xl font-black tracking-[-0.03em] text-[#2F2A28]">
-                      주요 화면
+                      문제 해결 경험
                     </h4>
                   </div>
 
-                  <p className="hidden text-sm font-bold text-[#9A8175] md:block">
-                    {project.images.some((image) => image.device === "desktop")
-                      ? "Desktop UI"
-                      : "Mobile UI"}
-                  </p>
+                  <div className="grid gap-5 lg:grid-cols-2">
+                    {project.troubles.map((trouble) => (
+                      <TroubleBox key={trouble.title} trouble={trouble} />
+                    ))}
+                  </div>
                 </div>
-
-                <div
-                  className={
-                    project.images.some((image) => image.device === "mobile")
-                      ? "grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-                      : "grid gap-5 md:grid-cols-3"
-                  }
-                >
-                  {project.images.map((image, imageIndex) => (
-                    <ProjectImageCard
-                      key={image.src}
-                      image={image}
-                      onClick={() =>
-                        openImageModal(
-                          project.title,
-                          project.images,
-                          imageIndex,
-                        )
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="border-t border-[#FFE8CD] bg-[#FFF8F4]/50 p-8 md:p-10">
-                <div className="mb-6">
-                  <p className="text-sm font-black uppercase tracking-[0.25em] text-[#D88F73]">
-                    Problem Solving
-                  </p>
-                  <h4 className="mt-2 text-2xl font-black tracking-[-0.03em] text-[#2F2A28]">
-                    문제 해결 경험
-                  </h4>
-                </div>
-
-                <div className="grid gap-5 lg:grid-cols-2">
-                  {project.troubles.map((trouble) => (
-                    <TroubleBox key={trouble.title} trouble={trouble} />
-                  ))}
-                </div>
-              </div>
-            </motion.article>
-          ))}
+              </motion.article>
+            );
+          })}
         </div>
       </div>
 
@@ -773,6 +854,41 @@ function Projects() {
         />
       )}
     </section>
+  );
+}
+
+function FeatureGroupCard({
+  group,
+  index,
+}: {
+  group: FeatureGroup;
+  index: number;
+}) {
+  return (
+    <article className="rounded-[1.7rem] border border-[#FFE8CD] bg-[#FFF8F4]/70 p-6 shadow-sm">
+      <div className="flex items-start gap-4">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-sm font-black text-[#D88F73] shadow-sm">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+
+        <div>
+          <h5 className="break-keep text-lg font-black tracking-[-0.02em] text-[#2F2A28]">
+            {group.title}
+          </h5>
+
+          <ul className="mt-4 space-y-3">
+            {group.items.map((item) => (
+              <li key={item} className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#D88F73]" />
+                <p className="break-keep text-sm font-bold leading-6 text-[#6F625C]">
+                  {item}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -805,7 +921,7 @@ function ProjectImageCard({
       <div
         className={[
           "relative w-full overflow-hidden bg-white",
-          isMobile ? "aspect-[9/16]" : "aspect-[16/10]",
+          isMobile ? "aspect-[9/16]" : "aspect-[16/9]",
         ].join(" ")}
       >
         <Image
@@ -815,12 +931,9 @@ function ProjectImageCard({
           sizes={
             isMobile
               ? "(max-width: 768px) 100vw, 33vw"
-              : "(max-width: 768px) 100vw, 33vw"
+              : "(max-width: 768px) 100vw, 50vw"
           }
-          className={[
-            "transition duration-500 group-hover:scale-[1.04]",
-            isMobile ? "object-contain p-3" : "object-cover object-top",
-          ].join(" ")}
+          className="object-contain p-3 transition duration-500 group-hover:scale-[1.04]"
         />
 
         <div className="absolute inset-0 flex items-center justify-center bg-[#2F2A28]/0 opacity-0 transition group-hover:bg-[#2F2A28]/20 group-hover:opacity-100">
@@ -832,7 +945,7 @@ function ProjectImageCard({
 
       <div className="min-h-[108px] border-t border-[#FFE8CD] bg-white px-5 py-4">
         <h5 className="break-keep text-base font-black tracking-[-0.02em] text-[#2F2A28]">
-          {image.caption.split(",")[0]}
+          {image.caption.split(":")[0]}
         </h5>
         <p className="mt-2 break-keep text-sm leading-6 text-[#6F625C]">
           {image.caption}
@@ -891,7 +1004,7 @@ function ImageModal({
               {modal.projectTitle} Preview
             </p>
             <h4 className="mt-1 break-keep text-lg font-black text-[#2F2A28]">
-              {currentImage.caption.split(",")[0]}
+              {currentImage.caption.split(":")[0]}
             </h4>
           </div>
 
