@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import type { IconType } from "react-icons";
 import {
   FiArrowRight,
   FiChevronLeft,
@@ -11,8 +12,18 @@ import {
   FiExternalLink,
   FiGithub,
   FiMail,
+  FiServer,
   FiX,
 } from "react-icons/fi";
+import {
+  SiFigma,
+  SiGithub,
+  SiJavascript,
+  SiNextdotjs,
+  SiReact,
+  SiTypescript,
+  SiVercel,
+} from "react-icons/si";
 
 type GalleryImage = {
   src: string;
@@ -46,8 +57,8 @@ type CaseStudy = {
   project: string;
   title: string;
   summary: string;
+  note?: string;
   details: CaseDetail[];
-  code?: string;
   images?: GalleryImage[];
 };
 
@@ -57,10 +68,32 @@ type ModalState = {
   currentIndex: number;
 };
 
+type SkillCardData = {
+  name: string;
+  icon: IconType;
+  iconClassName: string;
+  level: string;
+  levelClassName: string;
+  summary: string;
+  capabilities: string[];
+};
+
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
 };
+
+const playMapBeforeAfterImages: GalleryImage[] = [
+  {
+    src: "/projects/playmap/playmap-before.png",
+    caption: "Before · 기업이 제공한 놀이활동 분류 데이터와 내부 컬럼 구조",
+  },
+  {
+    src: "/projects/playmap/playmap-03.png",
+    caption:
+      "After · 누구와 · 어디에서 · 어떤 활동 · 얼마나를 선택하는 키워드 UI",
+  },
+];
 
 const projects: Project[] = [
   {
@@ -72,13 +105,13 @@ const projects: Project[] = [
     summary:
       "3주 부트캠프 프로젝트 종료 후에도 팀원들과 다시 모여 약 4개월간 자발적으로 고도화한 반려동물 케어 커뮤니티 서비스",
     highlight:
-      "카카오 OAuth 인증 흐름을 직접 검증하고, 사용자 정보·반려동물 데이터가 화면에 자연스럽게 반영되도록 API 연동을 구현했습니다.",
+      "카카오 OAuth 인증 흐름을 직접 검증하고, 사용자·반려동물 데이터가 여러 화면에 자연스럽게 반영되도록 API 연동과 상태 흐름을 구현했습니다.",
     tech: ["React", "TypeScript", "Recoil", "REST API", "Vercel"],
     roles: [
-      "공통 레이아웃과 Header·Secondary Header·Footer 구현",
+      "공통 레이아웃과 Header · Secondary Header · Footer 구현",
       "마이페이지 사용자 정보와 반려동물 데이터 API 연동",
       "프로필 수정 후 화면 상태 갱신 흐름 구현",
-      "페이지·컴포넌트·API 명세 문서화",
+      "페이지 · 컴포넌트 · API 명세 문서화",
       "카카오 OAuth 로그인 흐름 Technical PoC 진행",
     ],
     images: [
@@ -112,7 +145,7 @@ const projects: Project[] = [
     summary:
       "기업의 놀이활동 분류 데이터를 사용자가 쉽게 선택할 수 있는 4단계 키워드 UI로 재구성한 기업 협업 졸업 프로젝트",
     highlight:
-      "복잡한 대·중·소분류 데이터를 ‘누구와 → 어디에서 → 어떤 활동 → 얼마나’ 흐름으로 전환해 추천 활동과 기록 저장까지 연결했습니다.",
+      "복잡한 대·중·소분류 데이터를 ‘누구와 → 어디에서 → 어떤 활동 → 얼마나’ 흐름으로 전환해 추천 활동 조회와 기록 저장까지 연결했습니다.",
     tech: ["React", "TypeScript", "REST API", "react-calendar", "Bottom Sheet"],
     roles: [
       "기업 요구사항 및 놀이활동 분류 데이터 구조 분석",
@@ -123,16 +156,16 @@ const projects: Project[] = [
     ],
     images: [
       {
+        src: "/projects/playmap/playmap-03.png",
+        caption: "4단계 키워드 선택, 선택값 요약, 추천 활동 노출 화면",
+      },
+      {
+        src: "/projects/playmap/playmap-02.png",
+        caption: "놀이활동 기록을 위한 바텀시트 기반 입력 화면",
+      },
+      {
         src: "/projects/playmap/playmap-01.png",
         caption: "월별 캘린더와 날짜별 활동 기록 탐색 화면",
-      },
-      {
-        src: "/projects/playmap/playmap-03.png",
-        caption: "놀이활동 기록 생성용 바텀시트 UI",
-      },
-      {
-        src: "/projects/playmap/playmap-04.png",
-        caption: "4단계 키워드 선택, 선택값 요약, 추천 활동 노출 화면",
       },
     ],
     github: "https://github.com/k65860/playmap",
@@ -147,6 +180,7 @@ const caseStudies: CaseStudy[] = [
     title: "Kakao OAuth 인증 흐름 검증",
     summary:
       "인가 코드 수신부터 사용자 정보 확인과 MongoDB 저장까지 외부 로그인 흐름을 직접 검증했습니다.",
+    note: "최종 고도화 버전 미반영 · 일반 로그인 방식 사용",
     details: [
       {
         label: "문제 상황",
@@ -158,7 +192,7 @@ const caseStudies: CaseStudy[] = [
       },
       {
         label: "해결 방식",
-        text: "callback URL의 인가 코드 수신, 서버 사용자 정보 확인, MongoDB 저장 과정을 순서대로 검증했습니다.",
+        text: "Callback URL의 인가 코드 수신, 서버 사용자 정보 확인, MongoDB 저장 과정을 순서대로 검증했습니다.",
       },
       {
         label: "검증 결과",
@@ -172,11 +206,11 @@ const caseStudies: CaseStudy[] = [
     images: [
       {
         src: "/evidence/kakao-success.png",
-        caption: "카카오 로그인 후 callback URL과 로그인 성공 상태 확인",
+        caption: "Callback URL에서 인가 코드 수신 후 로그인 성공 상태 확인",
       },
       {
         src: "/evidence/kakao-mongo.png",
-        caption: "카카오 사용자 정보의 MongoDB 저장 흐름 확인",
+        caption: "카카오 사용자 정보가 MongoDB에 저장되는 흐름 확인",
       },
     ],
   },
@@ -190,28 +224,25 @@ const caseStudies: CaseStudy[] = [
     details: [
       {
         label: "문제 상황",
-        text: "게시글 API 호출에는 성공했지만 response.data.message[0]만 사용해 전체 목록과 사용자별 데이터를 안정적으로 다루기 어려웠습니다.",
+        text: "사용자 API 호출에는 성공했지만 응답 데이터가 배열과 중첩 객체 형태여서 필요한 값을 화면에 바로 사용하기 어려웠습니다.",
       },
       {
         label: "진단 과정",
-        text: "콘솔로 응답 구조를 확인한 결과 message는 배열이고 userId는 내부 객체 구조로 구성되어 있음을 확인했습니다.",
+        text: "콘솔로 응답 구조를 확인한 결과 message는 게시글 배열이고 userId는 내부 객체 구조로 구성되어 있음을 확인했습니다.",
       },
       {
         label: "해결 방식",
-        text: "게시글 배열 전체를 상태에 저장하고 userId._id를 기준으로 필요한 게시글을 필터링했습니다.",
+        text: "게시글 배열 전체를 기준으로 필요한 데이터를 매핑하고, userId 내부 값을 기준으로 사용자별 게시글을 분리했습니다.",
       },
       {
         label: "검증 결과",
-        text: "사용자별 게시글 목록과 게시글 상세 정보를 분리해 정상 렌더링했습니다.",
+        text: "사용자별 게시글 목록과 게시글 상세 정보를 분리해 화면에 정상 렌더링했습니다.",
       },
       {
         label: "배운 점",
-        text: "API 연동은 요청 성공 여부보다 응답 데이터의 배열·객체 구조와 깊이를 먼저 읽는 과정이 중요하다는 점을 배웠습니다.",
+        text: "API 연동은 요청 성공 여부보다 응답 데이터의 배열-객체-중첩 구조를 먼저 읽고 필요한 흐름을 나눠 설계하는 것이 중요하다는 점을 배웠습니다.",
       },
     ],
-    code: `const userPosts = response.data.message.filter(
-  (post) => post.userId?._id === currentUserId,
-);`,
   },
   {
     id: "playmap-data",
@@ -239,16 +270,10 @@ const caseStudies: CaseStudy[] = [
       },
       {
         label: "AI 활용",
-        text: "분류 기준을 빠르게 파악하는 보조 도구로 활용했고, 최종 키워드 체계와 데이터 연결 방식은 실제 요구사항을 기준으로 직접 검토했습니다.",
+        text: "분류 기준을 빠르게 이해하는 보조 도구로 AI를 활용했고, 최종 키워드 체계와 데이터 연결 방식은 실제 요구사항을 기준으로 직접 검토했습니다.",
       },
     ],
-    images: [
-      {
-        src: "/projects/playmap/playmap-04.png",
-        caption:
-          "놀이 대상·장소·활동·시간을 선택하고 추천 활동을 확인하는 화면",
-      },
-    ],
+    images: playMapBeforeAfterImages,
   },
 ];
 
@@ -256,17 +281,137 @@ const workCards = [
   {
     number: "01",
     title: "구조를 화면으로 바꿉니다",
-    desc: "복잡한 규칙과 데이터를 그대로 노출하지 않고, 사용자가 선택하고 이해하기 쉬운 흐름으로 재구성합니다.",
+    desc: [
+      "복잡한 규칙과 데이터를 그대로 노출하지 않습니다.",
+      "사용자가 선택하고 이해하기 쉬운 흐름으로 재구성합니다.",
+    ],
   },
   {
     number: "02",
     title: "화면과 데이터를 함께 봅니다",
-    desc: "UI 구현에 그치지 않고 API 응답 구조, 사용자 상태, 화면 갱신 흐름을 함께 확인합니다.",
+    desc: [
+      "UI 구현에 그치지 않고 API 응답 구조와 사용자 상태를 함께 확인합니다.",
+      "변경된 데이터가 화면에 자연스럽게 반영되는 흐름까지 점검합니다.",
+    ],
   },
   {
     number: "03",
     title: "기록하고 공유합니다",
-    desc: "페이지·컴포넌트·API 흐름을 문서화하고, 학습과 문제 해결 과정을 꾸준히 기록합니다.",
+    desc: [
+      "페이지·컴포넌트·API 흐름을 문서화합니다.",
+      "학습과 문제 해결 과정을 꾸준히 기록하고 공유합니다.",
+    ],
+  },
+];
+
+const originImages: GalleryImage[] = [
+  {
+    src: "/origin/rooting-odin.png",
+    caption:
+      "2012년, Odin과 펌웨어 정보를 확인하며 루팅 문제를 해결하려 했던 카페 기록",
+  },
+  {
+    src: "/origin/rooting-framework.png",
+    caption: "framework-res.apk 파일 교체와 권한 설정을 다루던 기록",
+  },
+];
+
+const skillCards: SkillCardData[] = [
+  {
+    name: "React",
+    icon: SiReact,
+    iconClassName: "text-[#61DAFB]",
+    level: "실전 구현",
+    levelClassName: "bg-[#E7F9FD] text-[#238AA5]",
+    summary: "컴포넌트를 나누고 상태와 사용자 인터랙션을 구현합니다.",
+    capabilities: [
+      "컴포넌트 단위 UI 설계",
+      "폼 · 모달 · 카드 UI 구현",
+      "API 데이터 화면 연결",
+    ],
+  },
+  {
+    name: "TypeScript",
+    icon: SiTypescript,
+    iconClassName: "text-[#3178C6]",
+    level: "프로젝트 적용",
+    levelClassName: "bg-[#EAF3FF] text-[#3178C6]",
+    summary: "Props와 API 데이터 구조를 타입으로 관리합니다.",
+    capabilities: [
+      "Props · State 타입 정의",
+      "API 응답 데이터 타입화",
+      "컴포넌트 데이터 흐름 관리",
+    ],
+  },
+  {
+    name: "JavaScript",
+    icon: SiJavascript,
+    iconClassName: "text-[#C19A00]",
+    level: "실전 구현",
+    levelClassName: "bg-[#FFF7D9] text-[#9C7700]",
+    summary: "비동기 처리와 배열 데이터를 화면에 가공합니다.",
+    capabilities: [
+      "async · await 비동기 처리",
+      "filter · map 데이터 가공",
+      "이벤트 · 조건부 렌더링",
+    ],
+  },
+  {
+    name: "Next.js",
+    icon: SiNextdotjs,
+    iconClassName: "text-[#171717]",
+    level: "학습 · 적용 중",
+    levelClassName: "bg-[#F1F1F1] text-[#555555]",
+    summary: "추억저장소를 개발하며 App Router 구조를 적용 중입니다.",
+    capabilities: [
+      "App Router 페이지 구조",
+      "Layout · Client Component",
+      "Vercel 기반 배포",
+    ],
+  },
+  {
+    name: "REST API",
+    icon: FiServer,
+    iconClassName: "text-[#7A5AF8]",
+    level: "프로젝트 적용",
+    levelClassName: "bg-[#F0ECFF] text-[#6950D8]",
+    summary: "서버 데이터를 분석하고 화면 흐름에 연결합니다.",
+    capabilities: [
+      "GET · POST · PATCH 요청",
+      "응답 데이터 구조 분석",
+      "중첩 객체 데이터 매핑",
+    ],
+  },
+  {
+    name: "Figma",
+    icon: SiFigma,
+    iconClassName: "text-[#F24E1E]",
+    level: "협업 활용",
+    levelClassName: "bg-[#FFF0EA] text-[#C85C39]",
+    summary: "디자인 시안을 읽고 실제 화면 구조로 구현합니다.",
+    capabilities: [
+      "시안 기반 레이아웃 구현",
+      "컴포넌트 단위 화면 분리",
+      "사용자 흐름 확인",
+    ],
+  },
+  {
+    name: "GitHub",
+    icon: SiGithub,
+    iconClassName: "text-[#171717]",
+    level: "협업 활용",
+    levelClassName: "bg-[#F1F1F1] text-[#555555]",
+    summary: "팀 코드와 작업 흐름을 공유하고 관리합니다.",
+    capabilities: ["브랜치 기반 작업", "팀 저장소 협업", "코드 및 문서 공유"],
+  },
+  {
+    name: "Vercel",
+    icon: SiVercel,
+    iconClassName: "text-[#171717]",
+    level: "배포 활용",
+    levelClassName: "bg-[#F1F1F1] text-[#555555]",
+    summary: "완성한 프론트엔드 프로젝트를 실제 환경에 배포합니다.",
+    capabilities: ["프로젝트 배포", "배포 환경 확인", "배포 URL 관리"],
   },
 ];
 
@@ -312,7 +457,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#FFF9F6] text-[#2F2A28]">
+    <main
+      id="top"
+      className="min-h-screen overflow-x-hidden bg-[#FFF9F6] text-[#2F2A28]"
+    >
       <Header />
       <Hero />
       <ProofStrip />
@@ -339,10 +487,10 @@ export default function Home() {
 
 function Header() {
   return (
-    <header className="fixed left-1/2 top-4 z-50 w-[calc(100%-40px)] max-w-6xl -translate-x-1/2 rounded-full border border-[#F3DED2] bg-white/80 shadow-sm backdrop-blur-xl">
+    <header className="fixed left-1/2 top-4 z-50 w-[calc(100%-32px)] max-w-6xl -translate-x-1/2 rounded-full border border-[#F3DED2] bg-white/80 shadow-sm backdrop-blur-xl">
       <div className="flex items-center justify-between px-5 py-3 md:px-6">
         <a
-          href="#"
+          href="#top"
           className="text-sm font-black tracking-tight text-[#2F2A28]"
         >
           Jiyeon Kim
@@ -395,7 +543,7 @@ function Hero() {
             Frontend Developer
           </p>
 
-          <h1 className="mt-7 break-keep text-5xl font-black leading-[1.16] tracking-[-0.06em] text-[#2F2A28] md:text-[66px]">
+          <h1 className="mt-7 break-keep text-5xl font-black leading-[1.16] tracking-[-0.06em] text-[#2F2A28] md:text-[50px]">
             복잡한 요구사항과 데이터를
             <br />
             사용자가 쉽게 선택하고 이해할 수 있는
@@ -406,10 +554,9 @@ function Hero() {
           </h1>
 
           <p className="mt-7 max-w-2xl break-keep text-lg leading-8 text-[#6F625C]">
-            React와 TypeScript를 기반으로 UI를 구현하고,
+            기업의 규칙 데이터를 단계형 키워드 UI로 바꾸고,
             <br className="hidden md:block" />
-            API 데이터와 사용자 흐름이 자연스럽게 이어지도록 고민하는 프론트엔드
-            개발자 김지연입니다.
+            OAuth·API 데이터 흐름을 직접 검증하며 사용자 경험으로 연결합니다.
           </p>
 
           <div className="mt-9 flex flex-wrap gap-3">
@@ -594,6 +741,12 @@ function SelectedWork({
                     </p>
                   </div>
 
+                  {project.id === "carebuddy" && <CareBuddyGrowth />}
+
+                  {project.id === "playmap" && (
+                    <PlayMapBeforeAfter onOpen={onOpen} />
+                  )}
+
                   <div className="mt-7 flex flex-wrap gap-2">
                     {project.tech.map((tech) => (
                       <span
@@ -633,6 +786,7 @@ function SelectedWork({
                     <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FFF0EA] text-[#B86B58]">
                       ✦
                     </span>
+
                     <div>
                       <p className="text-sm font-black uppercase tracking-[0.2em] text-[#C57966]">
                         My Contribution
@@ -647,11 +801,12 @@ function SelectedWork({
                     {project.roles.map((role, index) => (
                       <div
                         key={role}
-                        className="flex gap-4 items-center rounded-2xl border border-[#F3DED2] bg-[#FFF9F6] px-4 py-4"
+                        className="flex items-center gap-4 rounded-2xl border border-[#F3DED2] bg-[#FFF9F6] px-4 py-4"
                       >
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-black text-[#C57966] shadow-sm">
                           {index + 1}
                         </span>
+
                         <p className="break-keep text-sm font-bold leading-6 text-[#5F514C]">
                           {role}
                         </p>
@@ -691,6 +846,153 @@ function SelectedWork({
               </div>
             </motion.article>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CareBuddyGrowth() {
+  return (
+    <div className="mt-7 rounded-[1.5rem] border border-[#F3DED2] bg-[#FFF9F6] p-5">
+      <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C57966]">
+        Project Growth
+      </p>
+
+      <div className="mt-4 grid gap-2 text-center text-xs font-black text-[#6D5D56]">
+        <span className="rounded-xl bg-white px-3 py-3">3주 부트캠프 MVP</span>
+
+        <span className="text-[#C57966]">↓</span>
+
+        <span className="rounded-xl bg-white px-3 py-3">
+          팀원 자발적 재결합 · Discord 코어타임
+        </span>
+
+        <span className="text-[#C57966]">↓</span>
+
+        <span className="rounded-xl bg-[#E8F8F5] px-3 py-3">
+          약 4개월 기능·화면 완성도 고도화
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function PlayMapBeforeAfter({
+  onOpen,
+}: {
+  onOpen: (title: string, images: GalleryImage[], currentIndex: number) => void;
+}) {
+  return (
+    <section className="mt-8">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C57966]">
+            Before → After
+          </p>
+          <h4 className="mt-2 break-keep text-lg font-black tracking-[-0.03em] text-[#2F2A28]">
+            기업 데이터 구조를 사용자 선택 흐름으로 전환했습니다.
+          </h4>
+        </div>
+
+        <p className="hidden text-xs font-bold text-[#9A8175] md:block">
+          이미지를 클릭해 크게 보기
+        </p>
+      </div>
+
+      <div className="relative mt-5 overflow-hidden rounded-[1.5rem] border border-[#F3DED2] bg-white">
+        <div className="grid md:grid-cols-2">
+          <button
+            type="button"
+            onClick={() =>
+              onOpen("PlayMap Before → After", playMapBeforeAfterImages, 0)
+            }
+            className="group p-5 text-left md:p-6"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#B05F4D]">
+                  Before
+                </p>
+                <h5 className="mt-1 text-base font-black text-[#2F2A28]">
+                  기업 제공 데이터
+                </h5>
+              </div>
+
+              <span className="rounded-full bg-[#FFF4EF] px-2.5 py-1 text-[10px] font-black text-[#B05F4D]">
+                원본 구조
+              </span>
+            </div>
+
+            <p className="mt-2 text-xs font-bold leading-5 text-[#8A7770]">
+              대·중·소분류, 내부 컬럼, 코드 중심 데이터
+            </p>
+
+            <div className="relative mt-5 aspect-[4/3] rounded-[0.5rem] overflow-hidden bg-[#FBF7F4]">
+              <Image
+                src={playMapBeforeAfterImages[0].src}
+                alt={playMapBeforeAfterImages[0].caption}
+                fill
+                sizes="(max-width: 768px) 100vw, 30vw"
+                className="object-contain p-2 transition duration-500 group-hover:scale-[1.04]"
+              />
+
+              <div className="absolute inset-0 bg-[#2F2A28]/0 transition group-hover:bg-[#2F2A28]/10" />
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              onOpen("PlayMap Before → After", playMapBeforeAfterImages, 1)
+            }
+            className="group border-t border-[#F3DED2] p-5 text-left md:border-l md:border-t-0 md:p-6"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#168D86]">
+                  After
+                </p>
+                <h5 className="mt-1 text-base font-black text-[#2F2A28]">
+                  사용자 키워드 UI
+                </h5>
+              </div>
+
+              <span className="rounded-full bg-[#E8F8F5] px-2.5 py-1 text-[10px] font-black text-[#168D86]">
+                사용자 흐름
+              </span>
+            </div>
+
+            <p className="mt-2 text-xs font-bold leading-5 text-[#8A7770]">
+              누구와 · 어디에서 · 어떤 활동 · 얼마나
+            </p>
+
+            <div className="relative mt-5 aspect-[4/3] rounded-[0.5rem] overflow-hidden bg-[#F6FBFA]">
+              <Image
+                src={playMapBeforeAfterImages[1].src}
+                alt={playMapBeforeAfterImages[1].caption}
+                fill
+                sizes="(max-width: 768px) 100vw, 30vw"
+                className="object-contain p-2 transition duration-500 group-hover:scale-[1.04]"
+              />
+
+              <div className="absolute inset-0 bg-[#2F2A28]/0 transition group-hover:bg-[#2F2A28]/10" />
+            </div>
+          </button>
+        </div>
+
+        <div className="pointer-events-none absolute left-1/2 top-1/2 hidden h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#FFDCD3] text-[#B05F4D] shadow-sm md:flex">
+          <FiArrowRight />
+        </div>
+
+        <div className="border-t border-[#F3DED2] px-5 py-4">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-black text-[#6D5D56]">
+            <span>분류 기준 분석</span>
+            <FiArrowRight className="text-[#C57966]" />
+            <span>키워드 선택 상태 관리</span>
+            <FiArrowRight className="text-[#C57966]" />
+            <span className="text-[#168D86]">추천 활동 · 기록 저장 연결</span>
+          </div>
         </div>
       </div>
     </section>
@@ -748,6 +1050,7 @@ function CaseStudyCard({
         <span className="rounded-full bg-[#FFF0EA] px-3 py-1.5 text-xs font-black text-[#B05F4D]">
           {caseStudy.category}
         </span>
+
         <span className="rounded-full bg-[#F7F1EE] px-3 py-1.5 text-xs font-black text-[#7B6860]">
           {caseStudy.project}
         </span>
@@ -761,17 +1064,27 @@ function CaseStudyCard({
         {caseStudy.summary}
       </p>
 
+      {caseStudy.note && (
+        <p className="mt-4 rounded-xl bg-[#FFF9F6] px-3 py-2 text-xs font-bold leading-5 text-[#9A8175]">
+          {caseStudy.note}
+        </p>
+      )}
+
       {caseStudy.id === "playmap-data" && (
         <div className="mt-6 rounded-[1.4rem] border border-[#F3DED2] bg-[#FFF9F6] p-4">
           <div className="grid gap-2 text-center text-xs font-black text-[#6D5D56]">
             <span className="rounded-xl bg-white px-3 py-2">
               기업 분류 데이터
             </span>
+
             <span className="text-[#C57966]">↓</span>
+
             <span className="rounded-xl bg-white px-3 py-2">
               누구와 → 어디에서 → 어떤 활동 → 얼마나
             </span>
+
             <span className="text-[#C57966]">↓</span>
+
             <span className="rounded-xl bg-[#E8F8F5] px-3 py-2">
               추천 활동 조회 · 기록 저장
             </span>
@@ -779,17 +1092,11 @@ function CaseStudyCard({
         </div>
       )}
 
-      {caseStudy.code && (
-        <pre className="mt-6 overflow-x-auto rounded-[1.3rem] bg-[#2F2A28] p-4 text-xs leading-6 text-[#FFF4EE]">
-          <code>{caseStudy.code}</code>
-        </pre>
-      )}
-
       <details className="group mt-6 rounded-[1.4rem] border border-[#F3DED2] bg-[#FFF9F6]">
         <summary className="cursor-pointer list-none px-4 py-4 text-sm font-black text-[#2F2A28]">
           <span className="flex items-center justify-between">
             해결 과정 보기
-            <span className="text-[#C57966] transition group-open:rotate-45">
+            <span className="text-xl text-[#C57966] transition group-open:rotate-45">
               +
             </span>
           </span>
@@ -801,6 +1108,7 @@ function CaseStudyCard({
               <p className="text-xs font-black text-[#C57966]">
                 {detail.label}
               </p>
+
               <p className="mt-2 break-keep text-sm leading-6 text-[#665752]">
                 {detail.text}
               </p>
@@ -824,6 +1132,7 @@ function CaseStudyCard({
               className="object-contain p-3 transition duration-500 group-hover:scale-[1.04]"
             />
           </div>
+
           <p className="border-t border-[#F3DED2] bg-white px-4 py-3 text-sm font-bold text-[#665752]">
             {caseStudy.images[0].caption}
           </p>
@@ -857,12 +1166,16 @@ function HowIWork() {
               <span className="text-sm font-black tracking-[0.2em] text-[#C57966]">
                 {card.number}
               </span>
+
               <h3 className="mt-6 break-keep text-2xl font-black tracking-[-0.04em] text-[#2F2A28]">
                 {card.title}
               </h3>
-              <p className="mt-4 break-keep leading-7 text-[#665752]">
-                {card.desc}
-              </p>
+
+              <div className="mt-4 space-y-1 break-keep leading-7 text-[#665752]">
+                {card.desc.map((text) => (
+                  <p key={text}>{text}</p>
+                ))}
+              </div>
             </motion.article>
           ))}
         </div>
@@ -871,10 +1184,12 @@ function HowIWork() {
           <p className="text-sm font-black uppercase tracking-[0.2em] text-[#FFD5C8]">
             Persistence
           </p>
+
           <h3 className="mt-4 break-keep text-3xl font-black tracking-[-0.04em] md:text-4xl">
             프로젝트가 끝난 뒤에도,
             <br />더 나은 결과를 위해 다시 모였습니다.
           </h3>
+
           <p className="mt-5 max-w-3xl break-keep leading-8 text-white/75">
             CareBuddy는 원래 3주 부트캠프 프로젝트였습니다. 완성도가 아쉬워
             팀원들과 자발적으로 다시 모였고, 약 4개월 동안 Discord 코어타임을
@@ -891,24 +1206,12 @@ function Origin({
 }: {
   onOpen: (title: string, images: GalleryImage[], currentIndex: number) => void;
 }) {
-  const originImages: GalleryImage[] = [
-    {
-      src: "/origin/rooting-odin.png",
-      caption:
-        "2012년, Odin과 펌웨어 정보를 확인하며 루팅 문제를 해결하려 했던 카페 기록",
-    },
-    {
-      src: "/origin/rooting-framework.png",
-      caption: "framework-res.apk 파일 교체와 권한 설정을 다루던 기록",
-    },
-  ];
-
   return (
     <section
       id="story"
-      className="scroll-mt-28 bg-[#FFF0EA]/75 px-5 py-24 md:py-32"
+      className="scroll-mt-28 bg-[#FFF0EA]/75 px-5 py-16 lg:px-0 lg:py-0"
     >
-      <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[0.95fr_1.05fr]">
+      <div className="mx-auto grid w-full max-w-[1200px] items-center gap-12 py-24 lg:min-h-[1028px] lg:grid-cols-[0.95fr_1.05fr] lg:px-12 lg:py-0">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -927,9 +1230,8 @@ function Origin({
           </h2>
 
           <p className="mt-7 break-keep leading-8 text-[#665752]">
-            2011년부터 2012년 사이, 원하는 상단바 아이콘과 배터리 표시를
-            적용하고 싶어 스마트폰 루팅, 시스템 파일 교체, 권한 설정을
-            반복했습니다.
+            2012년 초등학교 4학년, 원하는 상단바 아이콘과 배터리 표시를 적용하고
+            싶어 스마트폰 루팅, 시스템 파일 교체, 권한 설정을 반복했습니다.
           </p>
 
           <p className="mt-4 break-keep leading-8 text-[#665752]">
@@ -969,7 +1271,7 @@ function Evidence() {
     {
       eyebrow: "Writing",
       title: "Velog 기술 기록 73편",
-      desc: "코딩테스트 풀이, 부트캠프 학습, 개발 중 마주한 문제와 해결 과정을 기록해왔습니다.",
+      desc: "코딩테스트 풀이, 부트캠프 학습, 개발 중 마주한 문제와 해결 과정을 꾸준히 기록해왔습니다.",
       action: "Velog 방문",
       href: "https://velog.io/@k65860",
     },
@@ -977,14 +1279,14 @@ function Evidence() {
       eyebrow: "Sharing",
       title: "멋쟁이사자처럼 실습 강의",
       desc: "부원 대상으로 개발자 성향 테스트 서비스 제작 과정을 약 2시간 동안 설명하고 함께 구현했습니다.",
-      action: "개발 경험 보기",
+      action: "GitHub 보기",
       href: "https://github.com/k65860",
     },
     {
       eyebrow: "Consistency",
       title: "배스킨라빈스 5년 4개월",
       desc: "장기 근속과 무지각으로 약속 시간, 인수인계, 맡은 일을 끝까지 책임지는 태도를 증명했습니다.",
-      action: "Resume 보기",
+      action: "이력서 보기",
       href: "/resume.pdf",
     },
   ];
@@ -1038,9 +1340,11 @@ function Evidence() {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-[#C57966]">
               Now Building
             </p>
+
             <h3 className="mt-3 text-2xl font-black tracking-[-0.04em] text-[#2F2A28]">
               Next.js 기반 추억저장소
             </h3>
+
             <p className="mt-3 break-keep leading-7 text-[#665752]">
               사진과 기록을 저장하고 다시 꺼내볼 수 있는 개인 아카이브 서비스를
               개발하며 Next.js App Router를 학습하고 있습니다.
@@ -1061,39 +1365,88 @@ function Evidence() {
           </div>
         </div>
 
-        <div className="mt-10">
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-[#C57966]">
-            Skills
-          </p>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {[
-              "React",
-              "TypeScript",
-              "Next.js",
-              "JavaScript",
-              "HTML/CSS",
-              "REST API",
-              "Axios",
-              "Recoil",
-              "SQL",
-              "Figma",
-              "Notion",
-              "GitHub",
-              "Postman",
-              "Vercel",
-            ].map((skill) => (
-              <span
-                key={skill}
-                className="rounded-full border border-[#F3DED2] bg-white px-4 py-2.5 text-sm font-black text-[#5F514C]"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        </div>
+        <SkillsCapability />
       </div>
     </section>
+  );
+}
+
+function SkillsCapability() {
+  return (
+    <div className="mt-14">
+      <div className="max-w-3xl">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-[#C57966]">
+          Skills & Capability
+        </p>
+
+        <h3 className="mt-4 break-keep text-3xl font-black tracking-[-0.04em] text-[#2F2A28]">
+          기술 이름보다,
+          <br />
+          실제로 구현할 수 있는 일을 보여드립니다.
+        </h3>
+
+        <p className="mt-4 break-keep leading-7 text-[#6F625C]">
+          숙련도를 퍼센트로 표현하기보다 프로젝트에서 직접 사용한 경험과 구현
+          가능한 범위를 기준으로 정리했습니다.
+        </p>
+      </div>
+
+      <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {skillCards.map((skill) => {
+          const Icon = skill.icon;
+
+          return (
+            <motion.article
+              key={skill.name}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.16 }}
+              variants={fadeUp}
+              transition={{ duration: 0.45 }}
+              className="group flex min-h-[335px] flex-col rounded-[2rem] border border-[#F3DED2] bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(123,83,60,0.1)]"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#F3DED2] bg-[#FFF9F6] shadow-sm">
+                  <Icon className={`text-2xl ${skill.iconClassName}`} />
+                </div>
+
+                <span
+                  className={`rounded-full px-2.5 py-1 text-[11px] font-black ${skill.levelClassName}`}
+                >
+                  {skill.level}
+                </span>
+              </div>
+
+              <h4 className="mt-6 text-2xl font-black tracking-[-0.04em] text-[#2F2A28]">
+                {skill.name}
+              </h4>
+
+              <p className="mt-3 break-keep text-sm leading-6 text-[#665752]">
+                {skill.summary}
+              </p>
+
+              <div className="mt-auto border-t border-[#F3DED2] pt-5">
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#C57966]">
+                  Capability
+                </p>
+
+                <ul className="mt-3 space-y-2">
+                  {skill.capabilities.map((capability) => (
+                    <li
+                      key={capability}
+                      className="flex gap-2 text-sm font-bold leading-6 text-[#5F514C]"
+                    >
+                      <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#C57966]" />
+                      <span className="break-keep">{capability}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.article>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -1126,7 +1479,7 @@ function Contact() {
 
           <div className="mt-9 flex flex-wrap gap-3">
             <a
-              href="mailto:jiyeon020327@gmail.com"
+              href="mailto:jy_0327@naver.com"
               className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-[#2F2A28] transition hover:-translate-y-1"
             >
               메일 보내기 <FiMail />
@@ -1178,9 +1531,11 @@ function SectionTitle({
       <p className="text-sm font-black uppercase tracking-[0.25em] text-[#C57966]">
         {eyebrow}
       </p>
+
       <h2 className="mt-5 break-keep text-4xl font-black leading-tight tracking-[-0.05em] text-[#2F2A28] md:text-5xl">
         {title}
       </h2>
+
       <p className="mt-5 break-keep leading-8 text-[#6F625C]">{desc}</p>
     </div>
   );
@@ -1272,6 +1627,7 @@ function ImageModal({
             <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C57966]">
               {modal.title}
             </p>
+
             <p className="mt-1 text-sm font-bold text-[#5F514C]">
               {currentImage.caption}
             </p>
