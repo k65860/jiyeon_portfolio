@@ -101,7 +101,7 @@ const projects: Project[] = [
     number: "01",
     icon: "🐾",
     title: "CareBuddy",
-    period: "2024.04 - 2024.10",
+    period: "기간 : 2024.04 MVP 개발 / 2024.06~2024.10 자발적 고도화",
     summary:
       "3주 부트캠프 프로젝트 종료 후에도 팀원들과 다시 모여 약 4개월간 자발적으로 고도화한 반려동물 케어 커뮤니티 서비스",
     highlight:
@@ -323,11 +323,12 @@ const skillCards: SkillCardData[] = [
     iconClassName: "text-[#61DAFB]",
     level: "실전 구현",
     levelClassName: "bg-[#E7F9FD] text-[#238AA5]",
-    summary: "컴포넌트를 나누고 상태와 사용자 인터랙션을 구현합니다.",
+    summary:
+      "컴포넌트 단위로 화면을 분리하고, 사용자 입력·상태 변화·API 데이터를 연결해 화면 흐름을 구현합니다.",
     capabilities: [
-      "컴포넌트 단위 UI 설계",
+      "CareBuddy: 마이페이지 사용자 정보/반려동물 데이터 렌더링",
+      "PlayMap: 키워드 선택 상태와 추천 활동 화면 연결",
       "폼 · 모달 · 카드 UI 구현",
-      "API 데이터 화면 연결",
     ],
   },
   {
@@ -375,11 +376,12 @@ const skillCards: SkillCardData[] = [
     iconClassName: "text-[#7A5AF8]",
     level: "프로젝트 적용",
     levelClassName: "bg-[#F0ECFF] text-[#6950D8]",
-    summary: "서버 데이터를 분석하고 화면 흐름에 연결합니다.",
+    summary:
+      "응답 구조를 콘솔로 확인하고, 필요한 데이터를 화면 흐름에 맞게 가공합니다.",
     capabilities: [
-      "GET · POST · PATCH 요청",
-      "응답 데이터 구조 분석",
-      "중첩 객체 데이터 매핑",
+      "CareBuddy: 중첩 API 응답 구조 분석",
+      "사용자별 게시글 필터링",
+      "GET · POST · PATCH 요청 경험",
     ],
   },
   {
@@ -498,7 +500,7 @@ function Header() {
 
         <nav className="hidden items-center gap-6 text-sm font-bold text-[#76665F] md:flex">
           <a href="#work" className="transition hover:text-[#2F2A28]">
-            Work
+            Project
           </a>
           <a href="#cases" className="transition hover:text-[#2F2A28]">
             Cases
@@ -514,13 +516,13 @@ function Header() {
           </a>
         </nav>
 
-        <a
+        {/* <a
           href="/resume.pdf"
           download
           className="rounded-full bg-[#2F2A28] px-3 py-2 text-xs font-black text-white transition hover:-translate-y-0.5 md:px-4"
         >
           Resume
-        </a>
+        </a> */}
       </div>
     </header>
   );
@@ -567,13 +569,13 @@ function Hero() {
               대표 프로젝트 보기 <FiArrowRight />
             </a>
 
-            <a
+            {/* <a
               href="/resume.pdf"
               download
               className="inline-flex items-center gap-2 rounded-full border border-[#F3DED2] bg-white/85 px-6 py-3 text-sm font-black text-[#2F2A28] transition hover:-translate-y-1"
             >
               이력서 다운로드 <FiDownload />
-            </a>
+            </a> */}
           </div>
 
           <div className="mt-7 flex flex-wrap gap-4 text-sm font-bold text-[#76665F]">
@@ -581,7 +583,7 @@ function Hero() {
               href="https://github.com/k65860"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 transition hover:text-[#2F2A28]"
+              className="inline-flex items-center gap-2 rounded-[1.5rem] bg-white p-2.5 transition hover:text-[#2F2A28]"
             >
               GitHub <FiGithub />
             </a>
@@ -590,7 +592,7 @@ function Hero() {
               href="https://velog.io/@k65860"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 transition hover:text-[#2F2A28]"
+              className="inline-flex items-center gap-2 rounded-[1.5rem] bg-white p-2.5 transition hover:text-[#2F2A28]"
             >
               Velog <FiExternalLink />
             </a>
@@ -1220,7 +1222,7 @@ function Origin({
           transition={{ duration: 0.55 }}
         >
           <p className="text-sm font-black uppercase tracking-[0.24em] text-[#C57966]">
-            Origin
+            Story
           </p>
 
           <h2 className="mt-5 break-keep text-4xl font-black leading-tight tracking-[-0.05em] text-[#2F2A28] md:text-5xl">
@@ -1270,7 +1272,7 @@ function Evidence() {
   const evidenceCards = [
     {
       eyebrow: "Writing",
-      title: "Velog 기술 기록 73편",
+      title: "Velog 기술 기록 75편",
       desc: "코딩테스트 풀이, 부트캠프 학습, 개발 중 마주한 문제와 해결 과정을 꾸준히 기록해왔습니다.",
       action: "Velog 방문",
       href: "https://velog.io/@k65860",
@@ -1284,10 +1286,10 @@ function Evidence() {
     },
     {
       eyebrow: "Consistency",
-      title: "배스킨라빈스 5년 4개월",
+      title: "배스킨라빈스 5년 5개월",
       desc: "장기 근속과 무지각으로 약속 시간, 인수인계, 맡은 일을 끝까지 책임지는 태도를 증명했습니다.",
-      action: "이력서 보기",
-      href: "/resume.pdf",
+      action: "",
+      href: "",
     },
   ];
 
@@ -1503,13 +1505,13 @@ function Contact() {
               Velog <FiExternalLink />
             </a>
 
-            <a
+            {/* <a
               href="/resume.pdf"
               download
               className="inline-flex items-center gap-2 rounded-full bg-white/15 px-6 py-3 text-sm font-black text-white transition hover:-translate-y-1"
             >
               이력서 다운로드 <FiDownload />
-            </a>
+            </a> */}
           </div>
         </motion.div>
       </div>
