@@ -9,7 +9,8 @@
 
 ## 소개
 
-이 사이트는 단순히 프로젝트 목록을 나열하지 않고 "어떤 문제를 어떻게 풀었는지"를 중심으로 구성했습니다. CareBuddy와 PlayMap 두 프로젝트를 대표작으로 선정해 각 프로젝트에서 맡은 역할과 문제 해결 과정을 API 데이터 흐름 단위로 정리했고 기술 검증(Technical PoC), 트러블슈팅, 설계 판단(Design Challenge)을 성격에 따라 구분해 보여줍니다.
+이 사이트는 "어떤 문제를 어떻게 풀었는지"를 중심으로 구성했습니다. 
+각 프로젝트에서 맡은 역할과 문제 해결 과정을 정리했고 기술 검증, 트러블슈팅, 설계 판단을 성격에 따라 구분해 보여줍니다.
 
 <br>
 
@@ -23,11 +24,10 @@
 
 | 구분 | 기술 |
 | --- | --- |
-| 프레임워크 | Next.js 16 (App Router) |
+| 프레임워크 | Next.js |
 | 언어 | TypeScript |
 | 스타일링 | Tailwind CSS 4 |
 | 애니메이션 | Framer Motion |
-| 기능 | html2canvas, jspdf (화면 캡처 및 PDF 저장) |
 | 배포 | Vercel |
 
 <br>
@@ -74,10 +74,3 @@ npm run dev
 ```
 
 브라우저에서 `http://localhost:3000` 접속
-
-<br>
-
-## 관련 프로젝트
-
-- [CareBuddy](https://github.com/care-buddy/Carebuddy) — 반려동물 커뮤니티 서비스 (React, TypeScript, Recoil)
-- [PlayMap](https://github.com/k65860/playmap) — 놀이활동 추천 및 기록 서비스 (React, TypeScript)
