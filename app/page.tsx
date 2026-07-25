@@ -1,485 +1,300 @@
 "use client";
 
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import type { IconType } from "react-icons";
+import { type ReactNode, useEffect, useState } from "react";
 import {
   FiArrowRight,
-  FiChevronLeft,
-  FiChevronRight,
-  FiDownload,
+  FiCheck,
   FiExternalLink,
   FiGithub,
   FiMail,
-  FiServer,
   FiX,
 } from "react-icons/fi";
-import {
-  SiFigma,
-  SiGithub,
-  SiJavascript,
-  SiNextdotjs,
-  SiReact,
-  SiTypescript,
-  SiVercel,
-} from "react-icons/si";
 
-type GalleryImage = {
-  src: string;
-  caption: string;
+type ProjectSection = {
+  title: string;
+  items: string[];
+};
+
+type Troubleshooting = {
+  title: string;
+  problem: string;
+  diagnosis: string;
+  solution: string;
+  result: string;
 };
 
 type Project = {
   id: string;
   number: string;
-  icon: string;
   title: string;
+  label: string;
   period: string;
-  status?: string;
+  type: string;
   summary: string;
-  highlight: string;
+  keyContribution: string;
+  role: string;
   tech: string[];
-  roles: string[];
-  images: GalleryImage[];
+  color: string;
+  textColor: string;
+  sections: ProjectSection[];
+  troubleshooting: Troubleshooting;
+  learned: string;
   github: string;
   service?: string;
-};
-
-type CaseDetail = {
-  label: string;
-  text: string;
-};
-
-type CaseStudy = {
-  id: string;
-  category: string;
-  project: string;
-  title: string;
-  summary: string;
   note?: string;
-  details: CaseDetail[];
-  images?: GalleryImage[];
 };
 
-type ModalState = {
-  title: string;
-  images: GalleryImage[];
-  currentIndex: number;
-};
-
-type SkillCardData = {
-  name: string;
-  icon: IconType;
-  iconClassName: string;
-  level: string;
-  levelClassName: string;
-  summary: string;
-  capabilities: string[];
-};
+const projects: Project[] = [
+  {
+    id: "memory-storage",
+    number: "01",
+    title: "추억저장소",
+    label: "AUTH · STORAGE · RLS",
+    period: "2026.03 — 진행 중",
+    type: "개인 프로젝트 · 기획/디자인/개발 100%",
+    summary:
+      "사진과 기록을 저장하고 로그인한 사용자별로 자신의 추억을 다시 확인하는 모바일 기록 서비스",
+    keyContribution:
+      "화면 구현을 넘어 인증, 이미지 저장, 데이터 소유권과 접근 권한까지 혼자 연결했습니다.",
+    role: "Product Designer · Frontend Developer",
+    tech: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS", "Supabase"],
+    color: "bg-[#F7D9DF]",
+    textColor: "text-[#733A4A]",
+    sections: [
+      {
+        title: "기획부터 개발까지 단독 진행",
+        items: [
+          "App Router로 로그인·회원가입·목록·등록·상세·수정 경로 구성",
+          "Header, Bottom Navigation, SideBar, MemoryCard, 수정 모달 컴포넌트 분리",
+          "제목 기준 실시간 검색과 모바일 퍼스트 인터페이스 구현",
+        ],
+      },
+      {
+        title: "사용자별 인증·데이터 구조",
+        items: [
+          "Supabase Auth로 회원가입·로그인·로그아웃 흐름 구현",
+          "Auth 사용자 ID를 profiles.id와 memories.user_id에 연결",
+          "조회·수정 요청에 현재 사용자 ID 조건을 포함하고 RLS 정책으로 권한 제한",
+        ],
+      },
+      {
+        title: "이미지 업로드 흐름",
+        items: [
+          "이미지 형식과 5MB 용량을 업로드 전에 검증",
+          "URL.createObjectURL()로 선택 즉시 로컬 미리보기 제공",
+          "Storage 업로드 후 Public URL을 받아 Database 기록과 순차 연결",
+        ],
+      },
+    ],
+    troubleshooting: {
+      title: "RLS 정책 누락으로 발생한 추억 등록 403 오류",
+      problem:
+        "로그인은 정상인데 추억 등록 요청이 403 Forbidden으로 차단됐습니다.",
+      diagnosis:
+        "요청 데이터가 아니라 Supabase 권한 설정을 확인했고, RLS는 활성화됐지만 INSERT 허용 정책이 없다는 점을 찾았습니다.",
+      solution:
+        "auth.uid()와 새 데이터의 user_id가 일치할 때만 등록을 허용하는 INSERT 정책을 작성했습니다.",
+      result:
+        "본인 데이터는 정상 저장되고 정책 조건을 충족하지 않는 요청은 차단되는 것을 확인했습니다.",
+    },
+    learned:
+      "인증은 로그인 화면으로 끝나지 않으며, 사용자 확인·데이터 소유 관계·서버 권한 정책이 함께 설계되어야 한다는 점을 배웠습니다.",
+    github: "https://github.com/k65860/memory_storage",
+  },
+  {
+    id: "playmap",
+    number: "02",
+    title: "PlayMap",
+    label: "DATA → INTERFACE",
+    period: "2025.05 — 2025.06",
+    type: "기업 협업 졸업 프로젝트 · Frontend",
+    summary:
+      "아이의 놀이 조건과 활동 키워드를 기반으로 놀이활동을 추천하고 기록하는 서비스",
+    keyContribution:
+      "기업의 복잡한 분류 데이터를 네 가지 질문으로 바꾸고, 선택·추천·기록 저장 흐름까지 구현했습니다.",
+    role: "Frontend Developer · UI Prototype",
+    tech: ["React", "TypeScript", "REST API", "react-calendar", "Figma"],
+    color: "bg-[#DDE5FF]",
+    textColor: "text-[#344D8B]",
+    sections: [
+      {
+        title: "기존 구조와 데이터 분석",
+        items: [
+          "기업 서비스의 폴더 구조, 공통 컴포넌트, API 호출 방식 선행 분석",
+          "분류 데이터를 ‘누구와·어디에서·어떤 활동을·얼마나’ 질문 UI로 재구성",
+          "대·소분류 조건 필터링과 동일 이름 키워드 중복 제거",
+        ],
+      },
+      {
+        title: "선택에서 추천까지",
+        items: [
+          "카테고리를 키로 하는 객체로 단계별 선택 상태 관리",
+          "선택값 요약과 개별 해제 UI 구현",
+          "PLAY_SQ 식별자로 키워드와 활동 설명 데이터를 연결해 추천 결과 표시",
+        ],
+      },
+      {
+        title: "기록 CRUD와 캘린더",
+        items: [
+          "월별 기록 날짜 표시와 선택 날짜의 상세 기록 조회 분리",
+          "기록 등록·수정·삭제 API를 화면 컴포넌트와 분리",
+          "긴 활동 내용은 카드 안에서 접고 펼칠 수 있도록 구현",
+        ],
+      },
+    ],
+    troubleshooting: {
+      title: "기록 생성과 키워드 연결 요청의 데이터 의존성",
+      problem:
+        "활동 기록과 여러 키워드를 서로 다른 API로 저장해야 해 요청 순서에 따라 연결이 실패할 수 있었습니다.",
+      diagnosis:
+        "키워드 연결 요청에는 기록 생성 응답에서 반환되는 RCD_SQ가 반드시 필요했습니다.",
+      solution:
+        "기록을 먼저 생성한 뒤 ID를 추출하고, 유효한 키워드 ID만 Promise.all()로 병렬 연결했습니다.",
+      result:
+        "하나의 활동 기록에 여러 키워드가 누락 없이 연결되고 중복 키워드도 화면에서 제거됐습니다.",
+    },
+    learned:
+      "UI를 만들기 전에 선택 상태의 구조와 API 사이의 데이터 의존 관계를 먼저 정의해야 한다는 점을 체감했습니다.",
+    github: "https://github.com/k65860/2025_PlayMap_FrontEnd.git",
+    note: "기업 저장소 운영 종료 후 개인 GitHub로 코드를 이전했습니다.",
+  },
+  {
+    id: "carebuddy",
+    number: "03",
+    title: "CareBuddy",
+    label: "API RESPONSE · STATE",
+    period: "2024.04 MVP · 2024.06 — 2024.10 고도화",
+    type: "부트캠프 팀 프로젝트 · Frontend",
+    summary:
+      "반려동물의 진료 기록을 작성하고 다른 사용자와 질병 정보를 공유하는 커뮤니티 서비스",
+    keyContribution:
+      "중첩된 사용자 응답 구조를 분석해 마이페이지 데이터를 연결하고, 수정 결과가 화면에 즉시 반영되도록 구현했습니다.",
+    role: "Frontend Developer · Documentation",
+    tech: ["React", "TypeScript", "Recoil", "styled-components", "Axios"],
+    color: "bg-[#DCEBDD]",
+    textColor: "text-[#315B3E]",
+    sections: [
+      {
+        title: "공통 레이아웃과 마이페이지",
+        items: [
+          "중첩 라우팅의 Outlet 영역에 마이페이지가 렌더링되도록 구조 수정",
+          "페이지별 Header·Footer 중복을 제거하고 공통 레이아웃 재사용",
+          "회원정보·반려동물·작성 글을 역할별 컴포넌트로 분리",
+        ],
+      },
+      {
+        title: "GET /me 응답 데이터 분배",
+        items: [
+          "response.data.message 전체를 사용자 상태에 저장",
+          "postId, buddyId 등 필요한 데이터만 각 하위 컴포넌트에 전달",
+          "게시글을 작성일순으로 정렬하고 삭제되지 않은 글만 렌더링",
+        ],
+      },
+      {
+        title: "프로필 수정과 협업 문서",
+        items: [
+          "FormData로 닉네임·소개글·이미지를 PUT /me에 동시 전송",
+          "선택 이미지 미리보기와 서버 응답 기반 사용자 상태 갱신",
+          "페이지·컴포넌트·담당자·API 요청/응답 명세를 문서화",
+        ],
+      },
+    ],
+    troubleshooting: {
+      title: "GET /me 응답 구조를 활용한 작성 글 렌더링",
+      problem:
+        "사용자 정보는 조회됐지만 로그인한 사용자의 작성 글이 마이페이지에 표시되지 않았습니다.",
+      diagnosis:
+        "실제 응답을 확인해 postId에 이미 해당 사용자의 게시글이 포함되어 있다는 점을 파악했습니다.",
+      solution:
+        "전체 게시글 재조회와 불필요한 ID 비교를 제거하고 사용자 응답을 상태에 저장해 필요한 컴포넌트로 나눴습니다.",
+      result:
+        "회원정보·반려동물·작성 글이 각 영역에 정상 표시됐고 데이터 흐름도 단순해졌습니다.",
+    },
+    learned:
+      "API 호출 성공 여부보다 실제 응답의 배열·객체·중첩 구조를 먼저 확인하고 화면에 필요한 데이터로 분리하는 습관을 갖게 됐습니다.",
+    github: "https://github.com/care-buddy/Carebuddy",
+    service: "https://carebuddy.vercel.app/",
+  },
+  {
+    id: "winehouse",
+    number: "04",
+    title: "Winehouse",
+    label: "VANILLA JS · ADMIN",
+    period: "2024 · 부트캠프 초기 프로젝트",
+    type: "팀 프로젝트 · 관리자 페이지 담당",
+    summary:
+      "고객이 원하는 와인을 탐색하고 구매할 수 있는 쇼핑몰과 관리자 운영 화면",
+    keyContribution:
+      "URL 식별자 기반 상품 렌더링부터 관리자 인증, 상품·주문 관리까지 웹 서비스의 전체 흐름을 처음 경험했습니다.",
+    role: "Frontend Developer · Admin UI",
+    tech: ["JavaScript", "HTML", "CSS", "Fetch API", "REST API"],
+    color: "bg-[#F1E1D2]",
+    textColor: "text-[#6D4932]",
+    sections: [
+      {
+        title: "동적 상품 화면",
+        items: [
+          "URLSearchParams로 categoryId와 productId 추출",
+          "목록·상세 API 응답을 DOM 요소로 만들어 화면에 렌더링",
+          "선택 수량에 따라 총가격을 계산하고 장바구니·주문 흐름 연결",
+        ],
+      },
+      {
+        title: "관리자 인증과 상품 관리",
+        items: [
+          "관리자 로그인 이메일 검증과 로그인 API 연동",
+          "토큰을 localStorage에 저장하고 인증 요청에 Bearer 헤더 전달",
+          "상품·카테고리 조회와 상품 추가·수정·삭제 화면 구현",
+        ],
+      },
+      {
+        title: "여러 API 응답 조합",
+        items: [
+          "주문별 배송 상태·상품 정보·상품 이미지를 추가 조회",
+          "서로 다른 응답을 주문 단위 화면 데이터로 조합",
+          "배송 상태·주문 일자·수량·금액·이미지를 하나의 카드에 표시",
+        ],
+      },
+    ],
+    troubleshooting: {
+      title: "관리자 인증 토큰 저장 키 불일치",
+      problem:
+        "관리자 로그인은 성공했지만 상품 등록·삭제와 카테고리 조회 요청이 실패했습니다.",
+      diagnosis:
+        "로그인 화면과 각 관리자 페이지에서 토큰 저장 키가 달랐고 일부 요청에는 인증 헤더가 없었습니다.",
+      solution:
+        "저장 키를 token으로 통일하고 권한이 필요한 요청에 Authorization: Bearer 헤더를 추가했습니다.",
+      result:
+        "로그인 이후 상품·카테고리 관리 API를 정상적으로 호출할 수 있게 됐습니다.",
+    },
+    learned:
+      "로그인은 토큰 발급으로 끝나지 않고 저장과 후속 요청의 전달 규칙까지 일관되어야 한다는 점을 배웠습니다.",
+    github: "https://github.com/k65860/Winehouse.git",
+  },
+];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
 };
 
-const playMapBeforeAfterImages: GalleryImage[] = [
-  {
-    src: "/projects/playmap/playmap-before.png",
-    caption: "Before · 기업이 제공한 놀이활동 분류 데이터와 내부 컬럼 구조",
-  },
-  {
-    src: "/projects/playmap/playmap-03.png",
-    caption:
-      "After · 누구와 · 어디에서 · 어떤 활동 · 얼마나를 선택하는 키워드 UI",
-  },
-];
-
-const projects: Project[] = [
-  {
-    id: "carebuddy",
-    number: "01",
-    icon: "🐾",
-    title: "CareBuddy",
-    period: "기간 : 2024.04 MVP 개발 / 2024.06~2024.10 자발적 고도화",
-    summary:
-      "3주 부트캠프 프로젝트 종료 후에도 팀원들과 다시 모여 약 4개월간 자발적으로 고도화한 반려동물 케어 커뮤니티 서비스",
-    highlight:
-      "카카오 OAuth 인증 흐름을 직접 검증하고, 사용자·반려동물 데이터가 여러 화면에 자연스럽게 반영되도록 API 연동과 상태 흐름을 구현했습니다.",
-    tech: ["React", "TypeScript", "Recoil", "REST API", "Vercel"],
-    roles: [
-      "공통 레이아웃과 Header · Secondary Header · Footer 구현",
-      "마이페이지 사용자 정보와 반려동물 데이터 API 연동",
-      "프로필 수정 후 화면 상태 갱신 흐름 구현",
-      "페이지 · 컴포넌트 · API 명세 문서화",
-      "카카오 OAuth 로그인 흐름 Technical PoC 진행",
-    ],
-    images: [
-      {
-        src: "/projects/carebuddy/carebuddy-01.png",
-        caption: "마이페이지 사용자 정보, 반려동물 카드, 작성 글 목록",
-      },
-      {
-        src: "/projects/carebuddy/carebuddy-02.png",
-        caption: "반려동물 카드와 사용자 작성 글 목록 UI",
-      },
-      {
-        src: "/projects/carebuddy/carebuddy-03.png",
-        caption: "반려동물 등록 모달 상단 입력 화면",
-      },
-      {
-        src: "/projects/carebuddy/carebuddy-04.png",
-        caption: "반려동물 등록 모달 하단 입력 및 저장 요청",
-      },
-    ],
-    github: "https://github.com/care-buddy/Carebuddy",
-    service: "https://carebuddy.vercel.app/",
-  },
-  {
-    id: "playmap",
-    number: "02",
-    icon: "👶🏻",
-    title: "PlayMap",
-    period: "2025.05 - 2025.06",
-    status: "기업 협업 졸업 프로젝트 · 배포 종료",
-    summary:
-      "기업의 놀이활동 분류 데이터를 사용자가 쉽게 선택할 수 있는 4단계 키워드 UI로 재구성한 기업 협업 졸업 프로젝트",
-    highlight:
-      "복잡한 대·중·소분류 데이터를 ‘누구와 → 어디에서 → 어떤 활동 → 얼마나’ 흐름으로 전환해 추천 활동 조회와 기록 저장까지 연결했습니다.",
-    tech: ["React", "TypeScript", "REST API", "react-calendar", "Bottom Sheet"],
-    roles: [
-      "기업 요구사항 및 놀이활동 분류 데이터 구조 분석",
-      "키워드 선택 → 추천 활동 → 기록 저장 흐름 구현",
-      "선택 키워드 요약 및 해제 UI 구현",
-      "추천 활동 표시와 기록 작성 화면 연결",
-      "react-calendar 기반 활동 기록 탐색 UI 구현",
-    ],
-    images: [
-      {
-        src: "/projects/playmap/playmap-03.png",
-        caption: "4단계 키워드 선택, 선택값 요약, 추천 활동 노출 화면",
-      },
-      {
-        src: "/projects/playmap/playmap-02.png",
-        caption: "놀이활동 기록을 위한 바텀시트 기반 입력 화면",
-      },
-      {
-        src: "/projects/playmap/playmap-01.png",
-        caption: "월별 캘린더와 날짜별 활동 기록 탐색 화면",
-      },
-    ],
-    github: "https://github.com/k65860/playmap",
-  },
-];
-
-const caseStudies: CaseStudy[] = [
-  {
-    id: "oauth",
-    category: "Technical PoC",
-    project: "CareBuddy",
-    title: "Kakao OAuth 인증 흐름 검증",
-    summary:
-      "인가 코드 수신부터 사용자 정보 확인과 MongoDB 저장까지 외부 로그인 흐름을 직접 검증했습니다.",
-    note: "최종 고도화 버전 미반영 · 일반 로그인 방식 사용",
-    details: [
-      {
-        label: "문제 상황",
-        text: "카카오 로그인 도입 과정에서 프론트엔드와 백엔드 사이의 인가 코드·사용자 정보 전달 흐름이 명확하지 않았습니다.",
-      },
-      {
-        label: "진단 과정",
-        text: "카카오 공식 문서를 기준으로 Redirect URI, 인가 코드, 사용자 정보 조회 흐름을 단계별로 정리했습니다.",
-      },
-      {
-        label: "해결 방식",
-        text: "Callback URL의 인가 코드 수신, 서버 사용자 정보 확인, MongoDB 저장 과정을 순서대로 검증했습니다.",
-      },
-      {
-        label: "검증 결과",
-        text: "로그인 성공 화면과 MongoDB 사용자 데이터 저장 로그를 통해 인증 흐름이 정상 동작함을 확인했습니다.",
-      },
-      {
-        label: "배운 점",
-        text: "외부 로그인은 버튼 하나를 붙이는 기능이 아니라 인증·데이터·서버 흐름 전체를 이해해야 하는 기능이라는 점을 배웠습니다.",
-      },
-    ],
-    images: [
-      {
-        src: "/evidence/kakao-success.png",
-        caption: "Callback URL에서 인가 코드 수신 후 로그인 성공 상태 확인",
-      },
-      {
-        src: "/evidence/kakao-mongo.png",
-        caption: "카카오 사용자 정보가 MongoDB에 저장되는 흐름 확인",
-      },
-    ],
-  },
-  {
-    id: "api-response",
-    category: "Troubleshooting",
-    project: "CareBuddy",
-    title: "중첩 API 응답 구조 분석",
-    summary:
-      "배열과 중첩 객체로 반환된 게시글 데이터를 분석해 사용자별 게시글을 안정적으로 렌더링했습니다.",
-    details: [
-      {
-        label: "문제 상황",
-        text: "사용자 API 호출에는 성공했지만 응답 데이터가 배열과 중첩 객체 형태여서 필요한 값을 화면에 바로 사용하기 어려웠습니다.",
-      },
-      {
-        label: "진단 과정",
-        text: "콘솔로 응답 구조를 확인한 결과 message는 게시글 배열이고 userId는 내부 객체 구조로 구성되어 있음을 확인했습니다.",
-      },
-      {
-        label: "해결 방식",
-        text: "게시글 배열 전체를 기준으로 필요한 데이터를 매핑하고, userId 내부 값을 기준으로 사용자별 게시글을 분리했습니다.",
-      },
-      {
-        label: "검증 결과",
-        text: "사용자별 게시글 목록과 게시글 상세 정보를 분리해 화면에 정상 렌더링했습니다.",
-      },
-      {
-        label: "배운 점",
-        text: "API 연동은 요청 성공 여부보다 응답 데이터의 배열-객체-중첩 구조를 먼저 읽고 필요한 흐름을 나눠 설계하는 것이 중요하다는 점을 배웠습니다.",
-      },
-    ],
-  },
-  {
-    id: "playmap-data",
-    category: "Design Challenge",
-    project: "PlayMap",
-    title: "기업 데이터 → 4단계 키워드 UI 전환",
-    summary:
-      "기업 내부의 놀이활동 분류 데이터를 사용자가 실제 상황에 맞게 선택할 수 있는 키워드 흐름으로 재설계했습니다.",
-    details: [
-      {
-        label: "문제 상황",
-        text: "대·중·소분류와 내부 용어로 구성된 놀이활동 데이터는 사용자가 그대로 이해하고 선택하기 어려웠습니다.",
-      },
-      {
-        label: "분석",
-        text: "놀이 대상, 장소, 활동 유형, 시간이라는 선택 기준으로 데이터를 다시 구조화했습니다.",
-      },
-      {
-        label: "UI 결정",
-        text: "복잡한 조건을 한 화면에 나열하지 않고 바텀시트에서 단계별 키워드를 선택하도록 구성했습니다.",
-      },
-      {
-        label: "결과",
-        text: "사용자는 추천 규칙을 몰라도 키워드 선택만으로 상황에 맞는 활동을 추천받고 기록할 수 있게 되었습니다.",
-      },
-      {
-        label: "AI 활용",
-        text: "분류 기준을 빠르게 이해하는 보조 도구로 AI를 활용했고, 최종 키워드 체계와 데이터 연결 방식은 실제 요구사항을 기준으로 직접 검토했습니다.",
-      },
-    ],
-    images: playMapBeforeAfterImages,
-  },
-];
-
-const workCards = [
-  {
-    number: "01",
-    title: "구조를 화면으로 바꿉니다",
-    desc: [
-      "복잡한 규칙과 데이터를 그대로 노출하지 않습니다.",
-      "사용자가 선택하고 이해하기 쉬운 흐름으로 재구성합니다.",
-    ],
-  },
-  {
-    number: "02",
-    title: "화면과 데이터를 함께 봅니다",
-    desc: [
-      "UI 구현에 그치지 않고 API 응답 구조와 사용자 상태를 함께 확인합니다.",
-      "변경된 데이터가 화면에 자연스럽게 반영되는 흐름까지 점검합니다.",
-    ],
-  },
-  {
-    number: "03",
-    title: "기록하고 공유합니다",
-    desc: [
-      "페이지·컴포넌트·API 흐름을 문서화합니다.",
-      "학습과 문제 해결 과정을 꾸준히 기록하고 공유합니다.",
-    ],
-  },
-];
-
-const originImages: GalleryImage[] = [
-  {
-    src: "/origin/rooting-odin.png",
-    caption:
-      "2012년, Odin과 펌웨어 정보를 확인하며 루팅 문제를 해결하려 했던 카페 기록",
-  },
-  {
-    src: "/origin/rooting-framework.png",
-    caption: "framework-res.apk 파일 교체와 권한 설정을 다루던 기록",
-  },
-];
-
-const skillCards: SkillCardData[] = [
-  {
-    name: "React",
-    icon: SiReact,
-    iconClassName: "text-[#61DAFB]",
-    level: "실전 구현",
-    levelClassName: "bg-[#E7F9FD] text-[#238AA5]",
-    summary:
-      "컴포넌트 단위로 화면을 분리하고, 사용자 입력·상태 변화·API 데이터를 연결해 화면 흐름을 구현합니다.",
-    capabilities: [
-      "CareBuddy: 마이페이지 사용자 정보/반려동물 데이터 렌더링",
-      "PlayMap: 키워드 선택 상태와 추천 활동 화면 연결",
-      "폼 · 모달 · 카드 UI 구현",
-    ],
-  },
-  {
-    name: "TypeScript",
-    icon: SiTypescript,
-    iconClassName: "text-[#3178C6]",
-    level: "프로젝트 적용",
-    levelClassName: "bg-[#EAF3FF] text-[#3178C6]",
-    summary: "Props와 API 데이터 구조를 타입으로 관리합니다.",
-    capabilities: [
-      "Props · State 타입 정의",
-      "API 응답 데이터 타입화",
-      "컴포넌트 데이터 흐름 관리",
-    ],
-  },
-  {
-    name: "JavaScript",
-    icon: SiJavascript,
-    iconClassName: "text-[#C19A00]",
-    level: "실전 구현",
-    levelClassName: "bg-[#FFF7D9] text-[#9C7700]",
-    summary: "비동기 처리와 배열 데이터를 화면에 가공합니다.",
-    capabilities: [
-      "async · await 비동기 처리",
-      "filter · map 데이터 가공",
-      "이벤트 · 조건부 렌더링",
-    ],
-  },
-  {
-    name: "Next.js",
-    icon: SiNextdotjs,
-    iconClassName: "text-[#171717]",
-    level: "학습 · 적용 중",
-    levelClassName: "bg-[#F1F1F1] text-[#555555]",
-    summary: "추억저장소를 개발하며 App Router 구조를 적용 중입니다.",
-    capabilities: [
-      "App Router 페이지 구조",
-      "Layout · Client Component",
-      "Vercel 기반 배포",
-    ],
-  },
-  {
-    name: "REST API",
-    icon: FiServer,
-    iconClassName: "text-[#7A5AF8]",
-    level: "프로젝트 적용",
-    levelClassName: "bg-[#F0ECFF] text-[#6950D8]",
-    summary:
-      "응답 구조를 콘솔로 확인하고, 필요한 데이터를 화면 흐름에 맞게 가공합니다.",
-    capabilities: [
-      "CareBuddy: 중첩 API 응답 구조 분석",
-      "사용자별 게시글 필터링",
-      "GET · POST · PATCH 요청 경험",
-    ],
-  },
-  {
-    name: "Figma",
-    icon: SiFigma,
-    iconClassName: "text-[#F24E1E]",
-    level: "협업 활용",
-    levelClassName: "bg-[#FFF0EA] text-[#C85C39]",
-    summary: "디자인 시안을 읽고 실제 화면 구조로 구현합니다.",
-    capabilities: [
-      "시안 기반 레이아웃 구현",
-      "컴포넌트 단위 화면 분리",
-      "사용자 흐름 확인",
-    ],
-  },
-  {
-    name: "GitHub",
-    icon: SiGithub,
-    iconClassName: "text-[#171717]",
-    level: "협업 활용",
-    levelClassName: "bg-[#F1F1F1] text-[#555555]",
-    summary: "팀 코드와 작업 흐름을 공유하고 관리합니다.",
-    capabilities: ["브랜치 기반 작업", "팀 저장소 협업", "코드 및 문서 공유"],
-  },
-  {
-    name: "Vercel",
-    icon: SiVercel,
-    iconClassName: "text-[#171717]",
-    level: "배포 활용",
-    levelClassName: "bg-[#F1F1F1] text-[#555555]",
-    summary: "완성한 프론트엔드 프로젝트를 실제 환경에 배포합니다.",
-    capabilities: ["프로젝트 배포", "배포 환경 확인", "배포 URL 관리"],
-  },
-];
-
 export default function Home() {
-  const [modal, setModal] = useState<ModalState | null>(null);
-
-  const openModal = (
-    title: string,
-    images: GalleryImage[],
-    currentIndex: number,
-  ) => {
-    setModal({ title, images, currentIndex });
-  };
-
-  const closeModal = () => setModal(null);
-
-  const showPrevious = () => {
-    setModal((prev) => {
-      if (!prev) return prev;
-
-      return {
-        ...prev,
-        currentIndex:
-          prev.currentIndex === 0
-            ? prev.images.length - 1
-            : prev.currentIndex - 1,
-      };
-    });
-  };
-
-  const showNext = () => {
-    setModal((prev) => {
-      if (!prev) return prev;
-
-      return {
-        ...prev,
-        currentIndex:
-          prev.currentIndex === prev.images.length - 1
-            ? 0
-            : prev.currentIndex + 1,
-      };
-    });
-  };
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   return (
-    <main
-      id="top"
-      className="min-h-screen overflow-x-hidden bg-[#FFF9F6] text-[#2F2A28]"
-    >
+    <main id="top" className="min-h-screen bg-[#F3F5F7] text-[#172033]">
       <Header />
       <Hero />
-      <ProofStrip />
-      <SelectedWork onOpen={openModal} />
-      <CaseStudies onOpen={openModal} />
-      <HowIWork />
-      <Origin onOpen={openModal} />
-      <Evidence />
+      <Experience />
+      <ProjectGrid onSelect={setSelectedProject} />
       <Contact />
 
       <AnimatePresence>
-        {modal && (
-          <ImageModal
-            modal={modal}
-            onClose={closeModal}
-            onPrevious={showPrevious}
-            onNext={showNext}
+        {selectedProject && (
+          <ProjectModal
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
           />
         )}
       </AnimatePresence>
@@ -489,40 +304,25 @@ export default function Home() {
 
 function Header() {
   return (
-    <header className="fixed left-1/2 top-4 z-50 w-[calc(100%-32px)] max-w-6xl -translate-x-1/2 rounded-full border border-[#F3DED2] bg-white/80 shadow-sm backdrop-blur-xl">
-      <div className="flex items-center justify-between px-5 py-3 md:px-6">
-        <a
-          href="#top"
-          className="text-sm font-black tracking-tight text-[#2F2A28]"
-        >
-          Jiyeon Kim
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-[#172033]/10 bg-[#F3F5F7]/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
+        <a href="#top" className="text-sm font-black tracking-[-0.02em]">
+          KIM JIYEON
         </a>
-
-        <nav className="hidden items-center gap-6 text-sm font-bold text-[#76665F] md:flex">
-          <a href="#work" className="transition hover:text-[#2F2A28]">
-            Project
+        <nav className="flex items-center gap-5 text-xs font-bold text-black/60 md:gap-8 md:text-sm">
+          <a className="transition hover:text-[#172033]" href="#experience">
+            Profile
           </a>
-          <a href="#cases" className="transition hover:text-[#2F2A28]">
-            Cases
+          <a className="transition hover:text-[#172033]" href="#projects">
+            Projects
           </a>
-          <a href="#story" className="transition hover:text-[#2F2A28]">
-            Story
-          </a>
-          <a href="#evidence" className="transition hover:text-[#2F2A28]">
-            Evidence
-          </a>
-          <a href="#contact" className="transition hover:text-[#2F2A28]">
+          <a
+            className="hidden transition hover:text-[#172033] sm:block"
+            href="#contact"
+          >
             Contact
           </a>
         </nav>
-
-        {/* <a
-          href="/resume.pdf"
-          download
-          className="rounded-full bg-[#2F2A28] px-3 py-2 text-xs font-black text-white transition hover:-translate-y-0.5 md:px-4"
-        >
-          Resume
-        </a> */}
       </div>
     </header>
   );
@@ -530,323 +330,180 @@ function Header() {
 
 function Hero() {
   return (
-    <section className="relative px-5 pb-20 pt-32 md:pb-24">
-      <div className="absolute left-[-150px] top-16 h-96 w-96 rounded-full bg-[#FFDCD3]/70 blur-3xl" />
-      <div className="absolute right-[-160px] top-1/3 h-[430px] w-[430px] rounded-full bg-[#F9E6CE]/80 blur-3xl" />
-
-      <div className="relative mx-auto grid min-h-[calc(100svh-145px)] max-w-6xl items-center gap-12 lg:grid-cols-[1.18fr_0.82fr]">
+    <section className="px-5 pb-14 pt-28 md:px-8 md:pb-20 md:pt-36">
+      <div className="mx-auto max-w-7xl">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          transition={{ duration: 0.7 }}
+          className="grid overflow-hidden rounded-[1.5rem] border border-[#172033]/10 bg-white shadow-[0_18px_55px_rgba(23,32,51,0.07)] md:grid-cols-[0.78fr_1.22fr]"
         >
-          <p className="inline-flex rounded-full border border-[#F3DED2] bg-white/80 px-4 py-2 text-sm font-black text-[#C57966] shadow-sm">
-            Frontend Developer
-          </p>
-
-          <h1 className="mt-7 break-keep text-5xl font-black leading-[1.16] tracking-[-0.06em] text-[#2F2A28] md:text-[50px]">
-            복잡한 요구사항과 데이터를
-            <br />
-            사용자가 쉽게 선택하고 이해할 수 있는
-            <br />
-            <span className="bg-gradient-to-r from-[#C57966] to-[#B96183] bg-clip-text text-transparent">
-              화면과 흐름으로 구현합니다.
-            </span>
-          </h1>
-
-          <p className="mt-7 max-w-2xl break-keep text-lg leading-8 text-[#6F625C]">
-            기업의 규칙 데이터를 단계형 키워드 UI로 바꾸고,
-            <br className="hidden md:block" />
-            OAuth·API 데이터 흐름을 직접 검증하며 사용자 경험으로 연결합니다.
-          </p>
-
-          <div className="mt-9 flex flex-wrap gap-3">
-            <a
-              href="#work"
-              className="inline-flex items-center gap-2 rounded-full bg-[#FFD2B5] px-6 py-3 text-sm font-black text-[#2F2A28] transition hover:-translate-y-1"
-            >
-              대표 프로젝트 보기 <FiArrowRight />
-            </a>
-
-            {/* <a
-              href="/resume.pdf"
-              download
-              className="inline-flex items-center gap-2 rounded-full border border-[#F3DED2] bg-white/85 px-6 py-3 text-sm font-black text-[#2F2A28] transition hover:-translate-y-1"
-            >
-              이력서 다운로드 <FiDownload />
-            </a> */}
-          </div>
-
-          <div className="mt-7 flex flex-wrap gap-4 text-sm font-bold text-[#76665F]">
-            <a
-              href="https://github.com/k65860"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-[1.5rem] bg-white p-2.5 transition hover:text-[#2F2A28]"
-            >
-              GitHub <FiGithub />
-            </a>
-
-            <a
-              href="https://velog.io/@k65860"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-[1.5rem] bg-white p-2.5 transition hover:text-[#2F2A28]"
-            >
-              Velog <FiExternalLink />
-            </a>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          transition={{ duration: 0.7, delay: 0.12 }}
-          className="mx-auto w-full max-w-[410px]"
-        >
-          <div className="rounded-[2.5rem] border border-[#F3DED2] bg-white/80 p-2.5 shadow-[0_28px_80px_rgba(123,83,60,0.12)] backdrop-blur-xl">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-[#FBE8DE]">
-              <Image
-                src="/profile.jpeg"
-                alt="김지연 프로필 사진"
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 410px"
-                className="object-cover"
-              />
-
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#2F2A28]/75 via-[#2F2A28]/20 to-transparent px-7 pb-7 pt-28 text-white">
-                <p className="text-3xl font-black tracking-[-0.04em]">김지연</p>
-                <p className="mt-1 text-sm font-bold text-white/85">
-                  Frontend Developer
-                </p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function ProofStrip() {
-  const proofs = [
-    {
-      number: "01",
-      title: "3주 → 4개월",
-      desc: "CareBuddy 프로젝트 자발적 고도화",
-    },
-    {
-      number: "02",
-      title: "규칙 데이터 → UI",
-      desc: "4단계 키워드 선택 흐름",
-    },
-    {
-      number: "03",
-      title: "Velog 73편 · SQLD",
-      desc: "기록과 데이터 구조 관심",
-    },
-  ];
-
-  return (
-    <section className="border-y border-[#F3DED2] bg-white/70 px-5 py-6 backdrop-blur-sm">
-      <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-3">
-        {proofs.map((proof) => (
           <div
-            key={proof.number}
-            className="flex items-center gap-4 rounded-2xl bg-[#FFF9F6] px-5 py-4"
+            className="relative flex min-h-[360px] items-center justify-center overflow-hidden bg-[#E8EDF3] md:min-h-[600px]"
+            role="img"
+            aria-label="개발자 이모지"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FFDCD3] text-sm font-black text-[#A85D4E]">
-              {proof.number}
+            <div className="absolute h-56 w-56 rounded-full bg-white/70 shadow-[0_20px_60px_rgba(23,32,51,0.10)] sm:h-64 sm:w-64 md:h-72 md:w-72" />
+            <span className="relative -translate-y-2 text-[8.5rem] leading-none drop-shadow-[0_14px_18px_rgba(23,32,51,0.12)] sm:text-[10rem] md:text-[11rem]">
+              👩🏻‍💻
             </span>
-
-            <div>
-              <p className="font-black tracking-[-0.02em] text-[#2F2A28]">
-                {proof.title}
-              </p>
-              <p className="mt-1 text-sm font-bold text-[#8A7770]">
-                {proof.desc}
-              </p>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#172033]/70 to-transparent px-7 pb-7 pt-20 text-xs font-black uppercase tracking-[0.22em] text-white">
+              Frontend Portfolio
             </div>
           </div>
-        ))}
+
+          <div className="flex flex-col justify-center p-7 sm:p-10 md:p-14 lg:p-16">
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#3566C8]">
+              Frontend Developer
+            </p>
+            <h1 className="mt-5 text-4xl font-black tracking-[-0.055em] sm:text-5xl lg:text-5xl">
+              김지연
+              <span className="mt-2 block text-xl font-bold tracking-[-0.025em] text-black/40 sm:text-2xl">
+                Kim Jiyeon
+              </span>
+            </h1>
+
+            <dl className="mt-10 divide-y divide-black/10 border-y border-black/10">
+              <ProfileRow
+                label="Education"
+                value={
+                  <>삼육대학교 인공지능융합학부 (복수전공: 컴퓨터공학부)</>
+                }
+              />
+              <ProfileRow label="Location" value="서울특별시 강동구" />
+              <ProfileRow
+                label="GitHub"
+                value={
+                  <a
+                    href="https://github.com/k65860"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline decoration-black/20 underline-offset-4 hover:decoration-black"
+                  >
+                    github.com/k65860
+                  </a>
+                }
+              />
+              <ProfileRow
+                label="Velog"
+                value={
+                  <a
+                    href="https://velog.io/@k65860/posts"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline decoration-black/20 underline-offset-4 hover:decoration-black"
+                  >
+                    velog.io/@k65860/posts
+                  </a>
+                }
+              />
+              <ProfileRow
+                label="Email"
+                value={
+                  <a
+                    href="mailto:jy_0327@naver.com"
+                    className="underline decoration-black/20 underline-offset-4 hover:decoration-black"
+                  >
+                    jy_0327@naver.com
+                  </a>
+                }
+              />
+            </dl>
+
+            <p className="mt-8 max-w-xl break-keep text-sm font-medium leading-7 text-[#172033]/55">
+              {/* React와 TypeScript를 중심으로 웹 서비스를 개발해 왔으며, 사용자
+              인증·API 연동·데이터 처리 경험을 프로젝트로 쌓았습니다. */}
+            </p>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
 }
 
-function SelectedWork({
-  onOpen,
-}: {
-  onOpen: (title: string, images: GalleryImage[], currentIndex: number) => void;
-}) {
+function ProfileRow({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <section id="work" className="scroll-mt-28 px-5 py-24 md:py-32">
-      <div className="mx-auto max-w-6xl">
-        <SectionTitle
-          eyebrow="Selected Work"
-          title="프로젝트보다, 어떤 문제를 풀었는지 보여드립니다."
-          desc="대표 프로젝트 2개를 중심으로 사용자 흐름, API 데이터, 설계 판단을 정리했습니다."
+    <div className="grid gap-2 py-4 sm:grid-cols-[110px_1fr] sm:gap-5">
+      <dt className="text-xs font-black uppercase tracking-[0.14em] text-black/35">
+        {label}
+      </dt>
+      <dd className="break-keep text-sm font-bold leading-6 sm:text-base">
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function ProjectGrid({ onSelect }: { onSelect: (project: Project) => void }) {
+  return (
+    <section id="projects" className="scroll-mt-20 px-5 py-20 md:px-8 md:py-28">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeading
+          eyebrow="Projects"
+          title="프로젝트"
+          description="프로젝트별 담당 역할과 구현 내용, 문제 해결 과정을 정리했습니다. 카드를 선택하면 상세 내용을 확인할 수 있습니다."
         />
 
-        <div className="mt-14 space-y-14">
-          {projects.map((project) => (
-            <motion.article
+        <div className="mt-12 grid gap-5 md:grid-cols-2">
+          {projects.map((project, index) => (
+            <motion.button
               key={project.id}
+              type="button"
+              onClick={() => onSelect(project)}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.12 }}
+              viewport={{ once: true, amount: 0.15 }}
               variants={fadeUp}
-              transition={{ duration: 0.55 }}
-              className="overflow-hidden rounded-[2.5rem] border border-[#F3DED2] bg-white/85 shadow-[0_25px_70px_rgba(123,83,60,0.08)]"
+              transition={{ delay: index * 0.05 }}
+              className={`${project.color} group flex min-h-[450px] flex-col rounded-[1.5rem] border border-[#172033]/10 p-7 text-left transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(23,32,51,0.10)] md:p-9`}
             >
-              <div className="grid lg:grid-cols-[0.95fr_1.05fr]">
-                <div className="border-b border-[#F3DED2] bg-gradient-to-br from-[#FFE3DA] via-[#FFF9F6] to-[#FBE9D7] p-8 md:p-10 lg:border-b-0 lg:border-r">
-                  <p className="text-sm font-black uppercase tracking-[0.24em] text-[#C57966]">
-                    Project {project.number}
-                  </p>
+              <div className="flex items-start justify-between gap-4">
+                <p
+                  className={`text-xs font-black tracking-[0.18em] ${project.textColor}`}
+                >
+                  {project.label}
+                </p>
+                <span className="text-sm font-black text-black/30">
+                  {project.number}
+                </span>
+              </div>
 
-                  <div className="mt-6 flex items-start gap-4">
-                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.2rem] border border-[#F3DED2] bg-white text-2xl shadow-sm">
-                      {project.icon}
-                    </span>
+              <div className="mt-16">
+                <p className="text-xs font-bold text-black/45">
+                  {project.type}
+                </p>
+                <h3 className="mt-3 text-4xl font-black tracking-[-0.055em] md:text-5xl">
+                  {project.title}
+                </h3>
+                <p className="mt-3 text-sm font-bold text-black/50">
+                  {project.period}
+                </p>
+                <p className="mt-7 max-w-xl break-keep text-lg font-bold leading-8">
+                  {project.summary}
+                </p>
+              </div>
 
-                    <div>
-                      <h3 className="text-4xl font-black tracking-[-0.05em] text-[#2F2A28]">
-                        {project.title}
-                      </h3>
-
-                      <p className="mt-2 text-sm font-black text-[#B06D5B]">
-                        {project.period}
-                      </p>
-                    </div>
-                  </div>
-
-                  <p className="mt-7 break-keep text-lg font-bold leading-8 text-[#5F514C]">
-                    {project.summary}
-                  </p>
-
-                  {project.status && (
-                    <span className="mt-5 inline-flex rounded-full bg-[#2F2A28] px-4 py-2 text-xs font-bold text-white">
-                      {project.status}
-                    </span>
-                  )}
-
-                  <div className="mt-7 rounded-[1.5rem] border border-[#F3DED2] bg-white/75 p-5">
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C57966]">
-                      Highlight
-                    </p>
-                    <p className="mt-3 break-keep font-bold leading-7 text-[#5F514C]">
-                      {project.highlight}
-                    </p>
-                  </div>
-
-                  {project.id === "carebuddy" && <CareBuddyGrowth />}
-
-                  {project.id === "playmap" && (
-                    <PlayMapBeforeAfter onOpen={onOpen} />
-                  )}
-
-                  <div className="mt-7 flex flex-wrap gap-2">
-                    {project.tech.map((tech) => (
+              <div className="mt-auto border-t border-black/15 pt-6">
+                <p className="break-keep text-sm font-bold leading-6 text-black/65">
+                  {project.keyContribution}
+                </p>
+                <div className="mt-6 flex items-center justify-between">
+                  <div className="flex flex-wrap gap-1.5">
+                    {project.tech.slice(0, 3).map((tech) => (
                       <span
                         key={tech}
-                        className="rounded-full bg-white px-3.5 py-2 text-xs font-black text-[#6F625C] shadow-sm"
+                        className="rounded-full bg-white/55 px-3 py-1.5 text-[11px] font-black"
                       >
                         {tech}
                       </span>
                     ))}
                   </div>
-
-                  <div className="mt-8 flex flex-wrap gap-3">
-                    {project.service && (
-                      <a
-                        href={project.service}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full bg-[#2F2A28] px-5 py-3 text-sm font-black text-white transition hover:-translate-y-1"
-                      >
-                        Service <FiExternalLink />
-                      </a>
-                    )}
-
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full border border-[#F3DED2] bg-white px-5 py-3 text-sm font-black text-[#2F2A28] transition hover:-translate-y-1"
-                    >
-                      GitHub <FiGithub />
-                    </a>
-                  </div>
-                </div>
-
-                <div className="p-8 md:p-10">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FFF0EA] text-[#B86B58]">
-                      ✦
-                    </span>
-
-                    <div>
-                      <p className="text-sm font-black uppercase tracking-[0.2em] text-[#C57966]">
-                        My Contribution
-                      </p>
-                      <h4 className="mt-1 text-2xl font-black tracking-[-0.03em] text-[#2F2A28]">
-                        맡은 역할
-                      </h4>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 space-y-3">
-                    {project.roles.map((role, index) => (
-                      <div
-                        key={role}
-                        className="flex items-center gap-4 rounded-2xl border border-[#F3DED2] bg-[#FFF9F6] px-4 py-4"
-                      >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-black text-[#C57966] shadow-sm">
-                          {index + 1}
-                        </span>
-
-                        <p className="break-keep text-sm font-bold leading-6 text-[#5F514C]">
-                          {role}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-10">
-                    <div className="flex items-end justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-black uppercase tracking-[0.2em] text-[#C57966]">
-                          Screens
-                        </p>
-                        <h4 className="mt-1 text-2xl font-black tracking-[-0.03em] text-[#2F2A28]">
-                          주요 화면
-                        </h4>
-                      </div>
-
-                      <p className="hidden text-sm font-bold text-[#9A8175] md:block">
-                        클릭해서 크게 보기
-                      </p>
-                    </div>
-
-                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                      {project.images.slice(0, 2).map((image, index) => (
-                        <GalleryCard
-                          key={image.src}
-                          image={image}
-                          onClick={() =>
-                            onOpen(project.title, project.images, index)
-                          }
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-white transition group-hover:rotate-[-35deg]">
+                    <FiArrowRight />
+                  </span>
                 </div>
               </div>
-            </motion.article>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -854,833 +511,370 @@ function SelectedWork({
   );
 }
 
-function CareBuddyGrowth() {
-  return (
-    <div className="mt-7 rounded-[1.5rem] border border-[#F3DED2] bg-[#FFF9F6] p-5">
-      <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C57966]">
-        Project Growth
-      </p>
-
-      <div className="mt-4 grid gap-2 text-center text-xs font-black text-[#6D5D56]">
-        <span className="rounded-xl bg-white px-3 py-3">3주 부트캠프 MVP</span>
-
-        <span className="text-[#C57966]">↓</span>
-
-        <span className="rounded-xl bg-white px-3 py-3">
-          팀원 자발적 재결합 · Discord 코어타임
-        </span>
-
-        <span className="text-[#C57966]">↓</span>
-
-        <span className="rounded-xl bg-[#E8F8F5] px-3 py-3">
-          약 4개월 기능·화면 완성도 고도화
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function PlayMapBeforeAfter({
-  onOpen,
-}: {
-  onOpen: (title: string, images: GalleryImage[], currentIndex: number) => void;
-}) {
-  return (
-    <section className="mt-8">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C57966]">
-            Before → After
-          </p>
-          <h4 className="mt-2 break-keep text-lg font-black tracking-[-0.03em] text-[#2F2A28]">
-            기업 데이터 구조를 사용자 선택 흐름으로 전환했습니다.
-          </h4>
-        </div>
-
-        <p className="hidden text-xs font-bold text-[#9A8175] md:block">
-          이미지를 클릭해 크게 보기
-        </p>
-      </div>
-
-      <div className="relative mt-5 overflow-hidden rounded-[1.5rem] border border-[#F3DED2] bg-white">
-        <div className="grid md:grid-cols-2">
-          <button
-            type="button"
-            onClick={() =>
-              onOpen("PlayMap Before → After", playMapBeforeAfterImages, 0)
-            }
-            className="group p-5 text-left md:p-6"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#B05F4D]">
-                  Before
-                </p>
-                <h5 className="mt-1 text-base font-black text-[#2F2A28]">
-                  기업 제공 데이터
-                </h5>
-              </div>
-
-              <span className="rounded-full bg-[#FFF4EF] px-2.5 py-1 text-[10px] font-black text-[#B05F4D]">
-                원본 구조
-              </span>
-            </div>
-
-            <p className="mt-2 text-xs font-bold leading-5 text-[#8A7770]">
-              대·중·소분류, 내부 컬럼, 코드 중심 데이터
-            </p>
-
-            <div className="relative mt-5 aspect-[4/3] rounded-[0.5rem] overflow-hidden bg-[#FBF7F4]">
-              <Image
-                src={playMapBeforeAfterImages[0].src}
-                alt={playMapBeforeAfterImages[0].caption}
-                fill
-                sizes="(max-width: 768px) 100vw, 30vw"
-                className="object-contain p-2 transition duration-500 group-hover:scale-[1.04]"
-              />
-
-              <div className="absolute inset-0 bg-[#2F2A28]/0 transition group-hover:bg-[#2F2A28]/10" />
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              onOpen("PlayMap Before → After", playMapBeforeAfterImages, 1)
-            }
-            className="group border-t border-[#F3DED2] p-5 text-left md:border-l md:border-t-0 md:p-6"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#168D86]">
-                  After
-                </p>
-                <h5 className="mt-1 text-base font-black text-[#2F2A28]">
-                  사용자 키워드 UI
-                </h5>
-              </div>
-
-              <span className="rounded-full bg-[#E8F8F5] px-2.5 py-1 text-[10px] font-black text-[#168D86]">
-                사용자 흐름
-              </span>
-            </div>
-
-            <p className="mt-2 text-xs font-bold leading-5 text-[#8A7770]">
-              누구와 · 어디에서 · 어떤 활동 · 얼마나
-            </p>
-
-            <div className="relative mt-5 aspect-[4/3] rounded-[0.5rem] overflow-hidden bg-[#F6FBFA]">
-              <Image
-                src={playMapBeforeAfterImages[1].src}
-                alt={playMapBeforeAfterImages[1].caption}
-                fill
-                sizes="(max-width: 768px) 100vw, 30vw"
-                className="object-contain p-2 transition duration-500 group-hover:scale-[1.04]"
-              />
-
-              <div className="absolute inset-0 bg-[#2F2A28]/0 transition group-hover:bg-[#2F2A28]/10" />
-            </div>
-          </button>
-        </div>
-
-        <div className="pointer-events-none absolute left-1/2 top-1/2 hidden h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#FFDCD3] text-[#B05F4D] shadow-sm md:flex">
-          <FiArrowRight />
-        </div>
-
-        <div className="border-t border-[#F3DED2] px-5 py-4">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-black text-[#6D5D56]">
-            <span>분류 기준 분석</span>
-            <FiArrowRight className="text-[#C57966]" />
-            <span>키워드 선택 상태 관리</span>
-            <FiArrowRight className="text-[#C57966]" />
-            <span className="text-[#168D86]">추천 활동 · 기록 저장 연결</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CaseStudies({
-  onOpen,
-}: {
-  onOpen: (title: string, images: GalleryImage[], currentIndex: number) => void;
-}) {
-  return (
-    <section
-      id="cases"
-      className="scroll-mt-28 bg-white/55 px-5 py-24 md:py-32"
-    >
-      <div className="mx-auto max-w-6xl">
-        <SectionTitle
-          eyebrow="Case Studies"
-          title="문제보다, 원인을 확인한 과정을 보여드립니다."
-          desc="오류 해결, 기술 검증, 설계 판단을 같은 방식으로 나열하지 않고 성격에 맞게 분리했습니다."
-        />
-
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {caseStudies.map((caseStudy) => (
-            <CaseStudyCard
-              key={caseStudy.id}
-              caseStudy={caseStudy}
-              onOpen={onOpen}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CaseStudyCard({
-  caseStudy,
-  onOpen,
-}: {
-  caseStudy: CaseStudy;
-  onOpen: (title: string, images: GalleryImage[], currentIndex: number) => void;
-}) {
-  return (
-    <motion.article
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.14 }}
-      variants={fadeUp}
-      transition={{ duration: 0.5 }}
-      className="flex h-full flex-col rounded-[2rem] border border-[#F3DED2] bg-white p-6 shadow-sm"
-    >
-      <div className="flex flex-wrap gap-2">
-        <span className="rounded-full bg-[#FFF0EA] px-3 py-1.5 text-xs font-black text-[#B05F4D]">
-          {caseStudy.category}
-        </span>
-
-        <span className="rounded-full bg-[#F7F1EE] px-3 py-1.5 text-xs font-black text-[#7B6860]">
-          {caseStudy.project}
-        </span>
-      </div>
-
-      <h3 className="mt-5 break-keep text-2xl font-black tracking-[-0.04em] text-[#2F2A28]">
-        {caseStudy.title}
-      </h3>
-
-      <p className="mt-4 break-keep font-bold leading-7 text-[#665752]">
-        {caseStudy.summary}
-      </p>
-
-      {caseStudy.note && (
-        <p className="mt-4 rounded-xl bg-[#FFF9F6] px-3 py-2 text-xs font-bold leading-5 text-[#9A8175]">
-          {caseStudy.note}
-        </p>
-      )}
-
-      {caseStudy.id === "playmap-data" && (
-        <div className="mt-6 rounded-[1.4rem] border border-[#F3DED2] bg-[#FFF9F6] p-4">
-          <div className="grid gap-2 text-center text-xs font-black text-[#6D5D56]">
-            <span className="rounded-xl bg-white px-3 py-2">
-              기업 분류 데이터
-            </span>
-
-            <span className="text-[#C57966]">↓</span>
-
-            <span className="rounded-xl bg-white px-3 py-2">
-              누구와 → 어디에서 → 어떤 활동 → 얼마나
-            </span>
-
-            <span className="text-[#C57966]">↓</span>
-
-            <span className="rounded-xl bg-[#E8F8F5] px-3 py-2">
-              추천 활동 조회 · 기록 저장
-            </span>
-          </div>
-        </div>
-      )}
-
-      <details className="group mt-6 rounded-[1.4rem] border border-[#F3DED2] bg-[#FFF9F6]">
-        <summary className="cursor-pointer list-none px-4 py-4 text-sm font-black text-[#2F2A28]">
-          <span className="flex items-center justify-between">
-            해결 과정 보기
-            <span className="text-xl text-[#C57966] transition group-open:rotate-45">
-              +
-            </span>
-          </span>
-        </summary>
-
-        <div className="space-y-3 border-t border-[#F3DED2] px-4 py-4">
-          {caseStudy.details.map((detail) => (
-            <div key={detail.label} className="rounded-xl bg-white p-3.5">
-              <p className="text-xs font-black text-[#C57966]">
-                {detail.label}
-              </p>
-
-              <p className="mt-2 break-keep text-sm leading-6 text-[#665752]">
-                {detail.text}
-              </p>
-            </div>
-          ))}
-        </div>
-      </details>
-
-      {caseStudy.images && (
-        <button
-          type="button"
-          onClick={() => onOpen(caseStudy.title, caseStudy.images!, 0)}
-          className="group mt-6 overflow-hidden rounded-[1.4rem] border border-[#F3DED2] bg-[#FFF9F6] text-left"
-        >
-          <div className="relative aspect-[16/10] overflow-hidden">
-            <Image
-              src={caseStudy.images[0].src}
-              alt={caseStudy.images[0].caption}
-              fill
-              sizes="(max-width: 768px) 100vw, 768px"
-              className="object-contain p-3 transition duration-500 group-hover:scale-[1.04]"
-            />
-          </div>
-
-          <p className="border-t border-[#F3DED2] bg-white px-4 py-3 text-sm font-bold text-[#665752]">
-            {caseStudy.images[0].caption}
-          </p>
-        </button>
-      )}
-    </motion.article>
-  );
-}
-
-function HowIWork() {
-  return (
-    <section className="px-5 py-24 md:py-32">
-      <div className="mx-auto max-w-6xl">
-        <SectionTitle
-          eyebrow="How I Work"
-          title="같이 일할 때의 방식을 보여드립니다."
-          desc="개발 방식과 협업 습관이 실제 프로젝트 경험에서 어떻게 드러났는지 정리했습니다."
-        />
-
-        <div className="mt-14 grid gap-5 md:grid-cols-3">
-          {workCards.map((card) => (
-            <motion.article
-              key={card.number}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={fadeUp}
-              transition={{ duration: 0.5 }}
-              className="rounded-[2rem] border border-[#F3DED2] bg-white/80 p-7 shadow-sm"
-            >
-              <span className="text-sm font-black tracking-[0.2em] text-[#C57966]">
-                {card.number}
-              </span>
-
-              <h3 className="mt-6 break-keep text-2xl font-black tracking-[-0.04em] text-[#2F2A28]">
-                {card.title}
-              </h3>
-
-              <div className="mt-4 space-y-1 break-keep leading-7 text-[#665752]">
-                {card.desc.map((text) => (
-                  <p key={text}>{text}</p>
-                ))}
-              </div>
-            </motion.article>
-          ))}
-        </div>
-
-        <div className="mt-5 rounded-[2rem] border border-[#F3DED2] bg-[#2F2A28] p-8 text-white md:p-10">
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-[#FFD5C8]">
-            Persistence
-          </p>
-
-          <h3 className="mt-4 break-keep text-3xl font-black tracking-[-0.04em] md:text-4xl">
-            프로젝트가 끝난 뒤에도,
-            <br />더 나은 결과를 위해 다시 모였습니다.
-          </h3>
-
-          <p className="mt-5 max-w-3xl break-keep leading-8 text-white/75">
-            CareBuddy는 원래 3주 부트캠프 프로젝트였습니다. 완성도가 아쉬워
-            팀원들과 자발적으로 다시 모였고, 약 4개월 동안 Discord 코어타임을
-            운영하며 기능과 화면 완성도를 고도화했습니다.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Origin({
-  onOpen,
-}: {
-  onOpen: (title: string, images: GalleryImage[], currentIndex: number) => void;
-}) {
-  return (
-    <section
-      id="story"
-      className="scroll-mt-28 bg-[#FFF0EA]/75 px-5 py-16 lg:px-0 lg:py-0"
-    >
-      <div className="mx-auto grid w-full max-w-[1200px] items-center gap-12 py-24 lg:min-h-[1028px] lg:grid-cols-[0.95fr_1.05fr] lg:px-12 lg:py-0">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeUp}
-          transition={{ duration: 0.55 }}
-        >
-          <p className="text-sm font-black uppercase tracking-[0.24em] text-[#C57966]">
-            Story
-          </p>
-
-          <h2 className="mt-5 break-keep text-4xl font-black leading-tight tracking-[-0.05em] text-[#2F2A28] md:text-5xl">
-            처음부터 화면이 바뀌는
-            <br />
-            원리가 궁금했습니다.
-          </h2>
-
-          <p className="mt-7 break-keep leading-8 text-[#665752]">
-            2012년 초등학교 4학년, 원하는 상단바 아이콘과 배터리 표시를 적용하고
-            싶어 스마트폰 루팅, 시스템 파일 교체, 권한 설정을 반복했습니다.
-          </p>
-
-          <p className="mt-4 break-keep leading-8 text-[#665752]">
-            파일 구조를 확인하고 재부팅하며 결과를 검증하던 경험은 지금도 복잡한
-            요구사항과 데이터를 사용자가 쉽게 사용할 수 있는 화면으로 바꾸는
-            방식으로 이어지고 있습니다.
-          </p>
-
-          <div className="mt-8 inline-flex rounded-full border border-[#F0CCBE] bg-white/70 px-4 py-2 text-sm font-black text-[#9E5D4D]">
-            Curiosity → Structure → Interface
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeUp}
-          transition={{ duration: 0.55, delay: 0.08 }}
-          className="grid gap-4 sm:grid-cols-2"
-        >
-          {originImages.map((image, index) => (
-            <GalleryCard
-              key={image.src}
-              image={image}
-              onClick={() => onOpen("Origin", originImages, index)}
-            />
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function Evidence() {
-  const evidenceCards = [
+function Experience() {
+  const activities = [
     {
-      eyebrow: "Writing",
-      title: "Velog 기술 기록 75편",
-      desc: "코딩테스트 풀이, 부트캠프 학습, 개발 중 마주한 문제와 해결 과정을 꾸준히 기록해왔습니다.",
-      action: "Velog 방문",
-      href: "https://velog.io/@k65860",
+      title: "삼육대학교 멋쟁이사자처럼 운영진",
+      period: "2021.03 — 2023.03",
     },
     {
-      eyebrow: "Sharing",
-      title: "멋쟁이사자처럼 실습 강의",
-      desc: "부원 대상으로 개발자 성향 테스트 서비스 제작 과정을 약 2시간 동안 설명하고 함께 구현했습니다.",
-      action: "GitHub 보기",
-      href: "https://github.com/k65860",
+      title: "멋쟁이사자처럼 해커톤 참가",
+      period: "2022.08.19 — 2022.08.20",
     },
     {
-      eyebrow: "Consistency",
-      title: "배스킨라빈스 5년 5개월",
-      desc: "장기 근속과 무지각으로 약속 시간, 인수인계, 맡은 일을 끝까지 책임지는 태도를 증명했습니다.",
-      action: "",
-      href: "",
+      title: "SW중심대학 해커톤 참가",
+      period: "2023.06.28 — 2023.06.30",
+    },
+    {
+      title: "엘리스 트랙 웹 개발자 부트캠프 수료",
+      period: "2023.12.25 — 2024.04.19",
     },
   ];
 
+  const certificates = [
+    { title: "SQLD", date: "2026.03" },
+    { title: "GTQ 그래픽기술자격 2급", date: "2014.09" },
+    { title: "인터넷 A등급", date: "2014.03" },
+    { title: "한글파워포인트 A등급", date: "2013.12" },
+    { title: "아래한글 B등급", date: "2013.03" },
+  ];
+
   return (
-    <section id="evidence" className="scroll-mt-28 px-5 py-24 md:py-32">
-      <div className="mx-auto max-w-6xl">
-        <SectionTitle
-          eyebrow="Writing & Evidence"
-          title="기록, 공유, 지속성도 개발 방식의 일부입니다."
-          desc="프로젝트 밖에서도 배운 것을 정리하고, 다른 사람에게 전달하며, 맡은 일을 꾸준히 이어왔습니다."
+    <section
+      id="experience"
+      className="scroll-mt-20 px-5 py-20 md:px-8 md:py-28"
+    >
+      <div className="mx-auto max-w-7xl">
+        <SectionHeading
+          eyebrow="Profile Details"
+          title="대내외활동 · 자격증"
+          // description="최신순으로 정리했습니다."
         />
 
-        <div className="mt-14 grid gap-5 md:grid-cols-3">
-          {evidenceCards.map((card) => (
-            <motion.article
-              key={card.title}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={fadeUp}
-              transition={{ duration: 0.5 }}
-              className="flex min-h-[285px] flex-col rounded-[2rem] border border-[#F3DED2] bg-white p-7 shadow-sm"
-            >
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-[#C57966]">
-                {card.eyebrow}
-              </p>
-
-              <h3 className="mt-5 break-keep text-2xl font-black tracking-[-0.04em] text-[#2F2A28]">
-                {card.title}
-              </h3>
-
-              <p className="mt-4 break-keep leading-7 text-[#665752]">
-                {card.desc}
-              </p>
-
-              <a
-                href={card.href}
-                target={card.href.startsWith("http") ? "_blank" : undefined}
-                rel={card.href.startsWith("http") ? "noreferrer" : undefined}
-                className="mt-auto inline-flex items-center gap-2 pt-7 text-sm font-black text-[#B05F4D] transition hover:translate-x-1"
-              >
-                {card.action} <FiArrowRight />
-              </a>
-            </motion.article>
-          ))}
-        </div>
-
-        <div className="mt-5 rounded-[2rem] border border-[#F3DED2] bg-[#FFF9F6] p-7 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-[#C57966]">
-              Now Building
-            </p>
-
-            <h3 className="mt-3 text-2xl font-black tracking-[-0.04em] text-[#2F2A28]">
-              Next.js 기반 추억저장소
+        <div className="mt-14 grid gap-6 lg:grid-cols-2">
+          <article className="rounded-[1.5rem] border border-[#172033]/10 bg-white p-7 shadow-[0_12px_35px_rgba(23,32,51,0.04)] md:p-9">
+            <h3 className="text-2xl font-black tracking-[-0.035em]">
+              대내외활동
             </h3>
+            <div className="mt-7 divide-y divide-[#172033]/10 border-y border-[#172033]/10">
+              {activities.map((item) => (
+                <div key={item.title} className="py-5">
+                  <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+                    <p className="font-bold">{item.title}</p>
+                    <time className="shrink-0 text-sm font-bold text-[#3566C8]">
+                      {item.period}
+                    </time>
+                  </div>
+                  {item.detail && (
+                    <p className="mt-1 text-sm text-[#172033]/45">
+                      {item.detail}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </article>
 
-            <p className="mt-3 break-keep leading-7 text-[#665752]">
-              사진과 기록을 저장하고 다시 꺼내볼 수 있는 개인 아카이브 서비스를
-              개발하며 Next.js App Router를 학습하고 있습니다.
-            </p>
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-2 md:mt-0 md:justify-end">
-            {["Next.js", "App Router", "TypeScript", "UI Architecture"].map(
-              (tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-white px-3.5 py-2 text-xs font-black text-[#6F625C] shadow-sm"
+          <article className="rounded-[1.5rem] border border-[#172033]/10 bg-white p-7 shadow-[0_12px_35px_rgba(23,32,51,0.04)] md:p-9">
+            <h3 className="text-2xl font-black tracking-[-0.035em]">자격증</h3>
+            <div className="mt-7 divide-y divide-[#172033]/10 border-y border-[#172033]/10">
+              {certificates.map((item) => (
+                <div
+                  key={item.title}
+                  className="flex items-center justify-between gap-5 py-5"
                 >
-                  {tag}
-                </span>
-              ),
-            )}
-          </div>
+                  <p className="font-bold">{item.title}</p>
+                  <time className="shrink-0 text-sm font-bold text-[#3566C8]">
+                    {item.date}
+                  </time>
+                </div>
+              ))}
+            </div>
+          </article>
         </div>
-
-        <SkillsCapability />
       </div>
     </section>
-  );
-}
-
-function SkillsCapability() {
-  return (
-    <div className="mt-14">
-      <div className="max-w-3xl">
-        <p className="text-sm font-black uppercase tracking-[0.2em] text-[#C57966]">
-          Skills & Capability
-        </p>
-
-        <h3 className="mt-4 break-keep text-3xl font-black tracking-[-0.04em] text-[#2F2A28]">
-          기술 이름보다,
-          <br />
-          실제로 구현할 수 있는 일을 보여드립니다.
-        </h3>
-
-        <p className="mt-4 break-keep leading-7 text-[#6F625C]">
-          숙련도를 퍼센트로 표현하기보다 프로젝트에서 직접 사용한 경험과 구현
-          가능한 범위를 기준으로 정리했습니다.
-        </p>
-      </div>
-
-      <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {skillCards.map((skill) => {
-          const Icon = skill.icon;
-
-          return (
-            <motion.article
-              key={skill.name}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.16 }}
-              variants={fadeUp}
-              transition={{ duration: 0.45 }}
-              className="group flex min-h-[335px] flex-col rounded-[2rem] border border-[#F3DED2] bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(123,83,60,0.1)]"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#F3DED2] bg-[#FFF9F6] shadow-sm">
-                  <Icon className={`text-2xl ${skill.iconClassName}`} />
-                </div>
-
-                <span
-                  className={`rounded-full px-2.5 py-1 text-[11px] font-black ${skill.levelClassName}`}
-                >
-                  {skill.level}
-                </span>
-              </div>
-
-              <h4 className="mt-6 text-2xl font-black tracking-[-0.04em] text-[#2F2A28]">
-                {skill.name}
-              </h4>
-
-              <p className="mt-3 break-keep text-sm leading-6 text-[#665752]">
-                {skill.summary}
-              </p>
-
-              <div className="mt-auto border-t border-[#F3DED2] pt-5">
-                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#C57966]">
-                  Capability
-                </p>
-
-                <ul className="mt-3 space-y-2">
-                  {skill.capabilities.map((capability) => (
-                    <li
-                      key={capability}
-                      className="flex gap-2 text-sm font-bold leading-6 text-[#5F514C]"
-                    >
-                      <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#C57966]" />
-                      <span className="break-keep">{capability}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.article>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
 function Contact() {
   return (
-    <section id="contact" className="scroll-mt-28 px-5 pb-20 pt-8 md:pb-24">
-      <div className="mx-auto max-w-6xl">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeUp}
-          transition={{ duration: 0.5 }}
-          className="rounded-[2.5rem] bg-gradient-to-br from-[#2F2A28] to-[#604C44] p-9 text-white md:p-14"
-        >
-          <p className="text-sm font-black uppercase tracking-[0.28em] text-[#FFD6C8]">
+    <footer id="contact" className="scroll-mt-20 px-5 pb-6 md:px-8">
+      <div className="mx-auto max-w-7xl rounded-[1.5rem] bg-[#172033] px-7 py-14 text-white md:px-12 md:py-20">
+        <p className="text-xs font-black uppercase tracking-[0.22em]">
+          Contact
+        </p>
+        <div className="mt-6 grid gap-10 md:grid-cols-[1.3fr_0.7fr] md:items-end">
+          <h2 className="break-keep text-4xl font-black leading-[1.08] tracking-[-0.06em] md:text-6xl">
             Contact
-          </p>
-
-          <h2 className="mt-5 break-keep text-4xl font-black leading-tight tracking-[-0.05em] md:text-5xl">
-            구조를 이해하고,
-            <br />
-            사용자 경험으로 구현하겠습니다.
           </h2>
-
-          <p className="mt-5 max-w-2xl break-keep leading-8 text-white/75">
-            GitHub, Velog, 이력서와 연락처를 한 번에 확인할 수 있도록
-            정리했습니다.
-          </p>
-
-          <div className="mt-9 flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 md:justify-end">
             <a
               href="mailto:jy_0327@naver.com"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-[#2F2A28] transition hover:-translate-y-1"
+              className="inline-flex items-center gap-2 rounded-full bg-[#4D7DE0] px-5 py-3 text-sm font-bold text-white"
             >
-              메일 보내기 <FiMail />
+              Email <FiMail />
             </a>
-
             <a
               href="https://github.com/k65860"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-white/15 px-6 py-3 text-sm font-black text-white transition hover:-translate-y-1"
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold"
             >
               GitHub <FiGithub />
             </a>
-
             <a
               href="https://velog.io/@k65860"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-white/15 px-6 py-3 text-sm font-black text-white transition hover:-translate-y-1"
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold"
             >
               Velog <FiExternalLink />
             </a>
-
-            {/* <a
-              href="/resume.pdf"
-              download
-              className="inline-flex items-center gap-2 rounded-full bg-white/15 px-6 py-3 text-sm font-black text-white transition hover:-translate-y-1"
-            >
-              이력서 다운로드 <FiDownload />
-            </a> */}
           </div>
-        </motion.div>
+        </div>
       </div>
-    </section>
+      <div className="mx-auto flex max-w-7xl justify-between px-1 py-6 text-xs font-bold text-black/40">
+        <span>© 2026 Kim Jiyeon · Frontend Portfolio</span>
+        <a href="#top">Back to top ↑</a>
+      </div>
+    </footer>
   );
 }
 
-function SectionTitle({
+function SectionHeading({
   eyebrow,
   title,
-  desc,
+  description,
+  dark = false,
 }: {
   eyebrow: string;
   title: string;
-  desc: string;
+  description: string;
+  dark?: boolean;
 }) {
   return (
-    <div className="max-w-3xl">
-      <p className="text-sm font-black uppercase tracking-[0.25em] text-[#C57966]">
-        {eyebrow}
+    <div className="grid gap-7 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+      <div>
+        <p
+          className={`text-xs font-black uppercase tracking-[0.22em] ${
+            dark ? "text-[#7FA6F5]" : "text-[#3566C8]"
+          }`}
+        >
+          {eyebrow}
+        </p>
+        <h2 className="mt-5 max-w-3xl break-keep text-4xl font-black leading-[1.12] tracking-[-0.055em] md:text-5xl">
+          {title}
+        </h2>
+      </div>
+      <p
+        className={`break-keep leading-7 ${dark ? "text-white/55" : "text-[#172033]/50"}`}
+      >
+        {description}
       </p>
-
-      <h2 className="mt-5 break-keep text-4xl font-black leading-tight tracking-[-0.05em] text-[#2F2A28] md:text-5xl">
-        {title}
-      </h2>
-
-      <p className="mt-5 break-keep leading-8 text-[#6F625C]">{desc}</p>
     </div>
   );
 }
 
-function GalleryCard({
-  image,
-  onClick,
-}: {
-  image: GalleryImage;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group overflow-hidden rounded-[1.5rem] border border-[#F3DED2] bg-[#FFF9F6] text-left shadow-sm transition hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(123,83,60,0.1)]"
-    >
-      <div className="relative aspect-[4/3] overflow-hidden bg-white">
-        <Image
-          src={image.src}
-          alt={image.caption}
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-contain p-3 transition duration-500 group-hover:scale-[1.04]"
-        />
-
-        <div className="absolute inset-0 flex items-center justify-center bg-[#2F2A28]/0 opacity-0 transition group-hover:bg-[#2F2A28]/20 group-hover:opacity-100">
-          <span className="rounded-full bg-white px-4 py-2 text-xs font-black text-[#2F2A28] shadow-sm">
-            크게 보기
-          </span>
-        </div>
-      </div>
-
-      <p className="min-h-[74px] border-t border-[#F3DED2] bg-white px-4 py-3 text-sm font-bold leading-6 text-[#5F514C]">
-        {image.caption}
-      </p>
-    </button>
-  );
-}
-
-function ImageModal({
-  modal,
+function ProjectModal({
+  project,
   onClose,
-  onPrevious,
-  onNext,
 }: {
-  modal: ModalState;
+  project: Project;
   onClose: () => void;
-  onPrevious: () => void;
-  onNext: () => void;
 }) {
-  const currentImage = modal.images[modal.currentIndex];
-  const hasMultipleImages = modal.images.length > 1;
-
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
-      if (event.key === "ArrowLeft") onPrevious();
-      if (event.key === "ArrowRight") onNext();
     };
 
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose, onPrevious, onNext]);
+  }, [onClose]);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-black/55 p-0 backdrop-blur-sm md:p-6"
       onClick={onClose}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#2F2A28]/75 px-5 py-8 backdrop-blur-sm"
     >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 12 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+      <motion.article
+        initial={{ opacity: 0, y: 30, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 30, scale: 0.985 }}
+        transition={{ duration: 0.25 }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={`${project.id}-title`}
         onClick={(event) => event.stopPropagation()}
-        className="relative max-h-[90vh] w-full max-w-6xl overflow-hidden rounded-[2rem] border border-[#F3DED2] bg-white shadow-[0_30px_90px_rgba(0,0,0,0.28)]"
+        className="mx-auto h-full max-w-6xl overflow-y-auto bg-[#F3F5F7] md:rounded-[1.5rem]"
       >
-        <div className="flex items-center justify-between gap-4 border-b border-[#F3DED2] bg-[#FFF9F6] px-5 py-4">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C57966]">
-              {modal.title}
-            </p>
-
-            <p className="mt-1 text-sm font-bold text-[#5F514C]">
-              {currentImage.caption}
-            </p>
-          </div>
-
+        <div
+          className={`relative px-6 pb-10 pt-20 md:px-12 md:pb-14 ${project.color}`}
+        >
           <button
             type="button"
             onClick={onClose}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-lg text-[#2F2A28] shadow-sm transition hover:bg-[#FFDCD3]"
-            aria-label="이미지 닫기"
+            className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/70 text-xl transition hover:bg-white"
+            aria-label="프로젝트 상세 닫기"
           >
             <FiX />
           </button>
+          <p
+            className={`text-xs font-black tracking-[0.2em] ${project.textColor}`}
+          >
+            PROJECT {project.number} · {project.label}
+          </p>
+          <h2
+            id={`${project.id}-title`}
+            className="mt-5 text-5xl font-black tracking-[-0.06em] md:text-7xl"
+          >
+            {project.title}
+          </h2>
+          <p className="mt-5 max-w-2xl break-keep text-xl font-bold leading-8">
+            {project.summary}
+          </p>
+
+          <dl className="mt-10 grid gap-5 border-t border-black/15 pt-6 text-sm sm:grid-cols-3">
+            <div>
+              <dt className="text-xs font-black text-black/40">PERIOD</dt>
+              <dd className="mt-2 font-bold">{project.period}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-black text-black/40">ROLE</dt>
+              <dd className="mt-2 font-bold">{project.role}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-black text-black/40">TYPE</dt>
+              <dd className="mt-2 font-bold">{project.type}</dd>
+            </div>
+          </dl>
         </div>
 
-        <div className="relative h-[min(68vh,720px)] bg-white">
-          <Image
-            src={currentImage.src}
-            alt={currentImage.caption}
-            fill
-            sizes="100vw"
-            className="object-contain p-4 md:p-8"
-          />
+        <div className="px-6 py-12 md:px-12 md:py-16">
+          <section className="grid gap-6 border-b border-black/15 pb-12 md:grid-cols-[0.35fr_0.65fr]">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-[#3566C8]">
+              Key Contribution
+            </h3>
+            <p className="break-keep text-2xl font-black leading-10 tracking-[-0.03em] md:text-3xl">
+              {project.keyContribution}
+            </p>
+          </section>
 
-          {hasMultipleImages && (
-            <>
-              <button
-                type="button"
-                onClick={onPrevious}
-                className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#2F2A28] shadow-md transition hover:bg-[#FFDCD3]"
-                aria-label="이전 이미지"
+          <section className="py-12">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-[#3566C8]">
+              What I Did
+            </h3>
+            <div className="mt-8 grid gap-5 lg:grid-cols-3">
+              {project.sections.map((section, index) => (
+                <article
+                  key={section.title}
+                  className="rounded-3xl bg-white p-6"
+                >
+                  <span className="text-xs font-black text-black/30">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h4 className="mt-4 text-xl font-black tracking-[-0.025em]">
+                    {section.title}
+                  </h4>
+                  <ul className="mt-5 space-y-3">
+                    {section.items.map((item) => (
+                      <li
+                        key={item}
+                        className="flex gap-2.5 text-sm leading-6 text-black/60"
+                      >
+                        <FiCheck className="mt-1 shrink-0 text-[#3566C8]" />
+                        <span className="break-keep">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-[1.5rem] bg-[#172033] p-7 text-white md:p-10">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#7FA6F5]">
+              Troubleshooting
+            </p>
+            <h3 className="mt-4 break-keep text-2xl font-black tracking-[-0.035em] md:text-3xl">
+              {project.troubleshooting.title}
+            </h3>
+            <div className="mt-8 grid gap-px overflow-hidden rounded-2xl bg-white/15 md:grid-cols-2">
+              {[
+                ["문제", project.troubleshooting.problem],
+                ["진단", project.troubleshooting.diagnosis],
+                ["해결", project.troubleshooting.solution],
+                ["결과", project.troubleshooting.result],
+              ].map(([label, text]) => (
+                <div key={label} className="bg-[#1E2940] p-5 md:p-6">
+                  <p className="text-xs font-black text-[#7FA6F5]">{label}</p>
+                  <p className="mt-3 break-keep text-sm leading-7 text-white/70">
+                    {text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-12 grid gap-6 border-y border-black/15 py-10 md:grid-cols-[0.35fr_0.65fr]">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-[#3566C8]">
+              What I Learned
+            </h3>
+            <div>
+              <p className="break-keep text-lg font-bold leading-8">
+                {project.learned}
+              </p>
+              {project.note && (
+                <p className="mt-4 break-keep text-sm leading-6 text-black/45">
+                  * {project.note}
+                </p>
+              )}
+            </div>
+          </section>
+
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-6">
+            <div className="flex flex-wrap gap-2">
+              {project.tech.map((tech) => (
+                <span
+                  key={tech}
+                  className="rounded-full border border-black/15 px-3.5 py-2 text-xs font-black"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              {project.service && (
+                <a
+                  href={project.service}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-black/15 px-5 py-3 text-sm font-bold"
+                >
+                  서비스 <FiExternalLink />
+                </a>
+              )}
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-black px-5 py-3 text-sm font-bold text-white"
               >
-                <FiChevronLeft />
-              </button>
-
-              <button
-                type="button"
-                onClick={onNext}
-                className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#2F2A28] shadow-md transition hover:bg-[#FFDCD3]"
-                aria-label="다음 이미지"
-              >
-                <FiChevronRight />
-              </button>
-
-              <span className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-[#2F2A28]/85 px-3 py-1.5 text-xs font-black text-white">
-                {modal.currentIndex + 1} / {modal.images.length}
-              </span>
-            </>
-          )}
+                GitHub <FiGithub />
+              </a>
+            </div>
+          </div>
         </div>
-      </motion.div>
+      </motion.article>
     </motion.div>
   );
 }
