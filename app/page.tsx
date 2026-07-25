@@ -448,7 +448,7 @@ function ProjectGrid({ onSelect }: { onSelect: (project: Project) => void }) {
         <SectionHeading
           eyebrow="Projects"
           title="프로젝트"
-          description="프로젝트별 담당 역할과 구현 내용, 문제 해결 과정을 정리했습니다. 카드를 선택하면 상세 내용을 확인할 수 있습니다."
+          // description="프로젝트별 담당 역할과 구현 내용, 문제 해결 과정을 정리했습니다. 카드를 선택하면 상세 내용을 확인할 수 있습니다."
         />
 
         <div className="mt-12 grid gap-5 md:grid-cols-2">
@@ -664,7 +664,6 @@ function SectionHeading({
 }: {
   eyebrow: string;
   title: string;
-  description: string;
   dark?: boolean;
 }) {
   return (
@@ -681,11 +680,11 @@ function SectionHeading({
           {title}
         </h2>
       </div>
-      <p
+      {/* <p
         className={`break-keep leading-7 ${dark ? "text-white/55" : "text-[#172033]/50"}`}
       >
         {description}
-      </p>
+      </p> */}
     </div>
   );
 }
