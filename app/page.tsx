@@ -580,11 +580,11 @@ function Experience() {
                       {item.period}
                     </time>
                   </div>
-                  {item.detail && (
+                  {/* {item.detail && (
                     <p className="mt-1 text-sm text-[#172033]/45">
                       {item.detail}
                     </p>
-                  )}
+                  )} */}
                 </div>
               ))}
             </div>
@@ -660,7 +660,6 @@ function Contact() {
 function SectionHeading({
   eyebrow,
   title,
-  description,
   dark = false,
 }: {
   eyebrow: string;
