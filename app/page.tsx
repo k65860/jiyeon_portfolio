@@ -28,6 +28,8 @@ type Project = {
   id: string;
   number: string;
   title: string;
+  thumbnail: string;
+  thumbnailPosition?: string;
   label: string;
   period: string;
   type: string;
@@ -50,13 +52,14 @@ const projects: Project[] = [
     id: "memory-storage",
     number: "01",
     title: "추억저장소",
+    thumbnail: "/projects/memory-storage.png",
     label: "AUTH · STORAGE · RLS",
-    period: "2026.03 — 진행 중",
+    period: "2026.04 — 진행 중",
     type: "개인 프로젝트 · 기획/디자인/개발 100%",
     summary:
       "사진과 기록을 저장하고 로그인한 사용자별로 자신의 추억을 다시 확인하는 모바일 기록 서비스",
     keyContribution:
-      "화면 구현을 넘어 인증, 이미지 저장, 데이터 소유권과 접근 권한까지 혼자 연결했습니다.",
+      "화면 구현과 인증, 이미지 저장, 데이터 소유권과 접근 권한까지 혼자 연결했습니다.",
     role: "Product Designer · Frontend Developer",
     tech: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS", "Supabase"],
     color: "bg-[#F7D9DF]",
@@ -106,13 +109,14 @@ const projects: Project[] = [
     id: "playmap",
     number: "02",
     title: "PlayMap",
+    thumbnail: "/projects/playmap.png",
     label: "DATA → INTERFACE",
     period: "2025.05 — 2025.06",
     type: "기업 협업 졸업 프로젝트 · Frontend",
     summary:
       "아이의 놀이 조건과 활동 키워드를 기반으로 놀이활동을 추천하고 기록하는 서비스",
     keyContribution:
-      "기업의 복잡한 분류 데이터를 네 가지 질문으로 바꾸고, 선택·추천·기록 저장 흐름까지 구현했습니다.",
+      "기업의 복잡한 분류 데이터를 선택·추천·기록 저장으로 구현했습니다.",
     role: "Frontend Developer · UI Prototype",
     tech: ["React", "TypeScript", "REST API", "react-calendar", "Figma"],
     color: "bg-[#DDE5FF]",
@@ -163,6 +167,7 @@ const projects: Project[] = [
     id: "carebuddy",
     number: "03",
     title: "CareBuddy",
+    thumbnail: "/projects/carebuddy.png",
     label: "API RESPONSE · STATE",
     period: "2024.04 MVP · 2024.06 — 2024.10 고도화",
     type: "부트캠프 팀 프로젝트 · Frontend",
@@ -220,6 +225,8 @@ const projects: Project[] = [
     id: "winehouse",
     number: "04",
     title: "Winehouse",
+    thumbnail: "/projects/winehouse.png",
+    thumbnailPosition: "object-top",
     label: "VANILLA JS · ADMIN",
     period: "2024 · 부트캠프 초기 프로젝트",
     type: "팀 프로젝트 · 관리자 페이지 담당",
@@ -468,7 +475,15 @@ function ProjectGrid({ onSelect }: { onSelect: (project: Project) => void }) {
                 </span>
               </div>
 
-              <div className="mt-16">
+              <div className="mt-5 overflow-hidden rounded-[1.1rem] border border-black/10 bg-white/50">
+                <img
+                  src={project.thumbnail}
+                  alt={`${project.title} 프로젝트 대표 화면`}
+                  className={`h-80 w-full object-cover ${project.thumbnailPosition ?? "object-center"}`}
+                />
+              </div>
+
+              <div className="mt-7">
                 <p className="text-xs font-bold text-black/45">
                   {project.type}
                 </p>
